@@ -129,6 +129,26 @@ function initLandingPage() {
     });
   }
 
+  // Scroll reveal animation for sections
+  const scrollRevealElements = document.querySelectorAll('.scroll-reveal');
+
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        // Once revealed, stop observing (animation only happens once)
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.15,
+    rootMargin: '0px 0px -50px 0px'
+  });
+
+  scrollRevealElements.forEach(el => {
+    revealObserver.observe(el);
+  });
+
   // Load US Map SVG
   loadUSMap();
 }

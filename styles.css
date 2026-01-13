@@ -97,7 +97,7 @@ body {
 }
 
 .landing-logo {
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 700;
   color: var(--primary-navy);
   text-decoration: none;
@@ -208,8 +208,18 @@ body {
   backdrop-filter: blur(12px);
 }
 
+.hero-section-new {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+}
+
+.hero-card-new {
+  width: 100%;
+}
+
 .hero-content-new {
-  padding: 50px 40px;
+  padding: 80px 40px;
   text-align: center;
   color: white;
 }
@@ -2673,11 +2683,11 @@ body {
    ========================================== */
 .deregulation-map-container {
   margin-top: 32px;
-  background: var(--bg-white);
+  background: transparent;
   border-radius: var(--radius-lg);
   padding: 24px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-light);
+  box-shadow: none;
+  border: none;
 }
 
 .deregulation-map-container h3.map-title {
@@ -2760,7 +2770,7 @@ body {
 }
 
 .state.regulated {
-  fill: #d1d5db; /* gray-300 - Fully regulated */
+  fill: #6b7280; /* gray-500 - Fully regulated, darker for visibility */
 }
 
 /* Hover states */
@@ -2781,7 +2791,7 @@ body {
 }
 
 .state.regulated:hover {
-  fill: #e5e7eb;
+  fill: #9ca3af;
 }
 
 /* State Tooltip */
@@ -2912,7 +2922,7 @@ body {
 }
 
 .legend-color.regulated {
-  background: #d1d5db;
+  background: #6b7280;
 }
 
 /* Responsive adjustments */
@@ -2939,4 +2949,18 @@ body {
     font-size: 12px;
     padding: 10px 12px;
   }
+}
+
+/* ==========================================
+   SCROLL REVEAL ANIMATIONS
+   ========================================== */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
 }
