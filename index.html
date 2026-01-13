@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideal - Take Control of Your Energy Future</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.js"></script>
+</head>
+<body>
+    <!-- Landing Page -->
+    <div class="landing-page" id="landing-page">
+        <!-- SECTION 1: Navigation -->
+        <nav class="landing-nav" id="landing-nav">
+            <div class="landing-nav-container">
+                <a href="#" class="landing-logo" data-tab="home">Ideal</a>
+                <div class="landing-nav-center">
+                    <button class="get-started-btn-sticky" id="get-started-btn-sticky">Get Started</button>
+                </div>
+                <div class="landing-nav-tabs">
+                    <button class="nav-tab" data-tab="about">About</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Home Tab Content -->
+        <div class="tab-content active" id="home-tab">
+            <!-- Fixed Background Image -->
+            <div class="fixed-background"></div>
+
+            <!-- Landing Sections Container -->
+            <div class="landing-sections-wrapper">
+
+                <!-- SECTION 2: Hero - "Take control of your energy future" -->
+                <section class="landing-section hero-section-new">
+                    <div class="section-card hero-card-new">
+                        <div class="hero-content-new">
+                            <h1 class="hero-title-new">Take control of your energy future</h1>
+                            <p class="hero-subtitle-new">Ideal is your trusted energy procurement partner. We help homes and businesses reduce their electricity and natural gas costs through competitive market auctions in deregulated states.</p>
+
+                            <div class="value-props-new">
+                                <div class="value-prop-new">
+                                    <div class="value-prop-number-new">01</div>
+                                    <h3>Electricity Auctions</h3>
+                                    <p>We auction your electricity contract to multiple providers, ensuring you get the most competitive rates available in your market.</p>
+                                </div>
+
+                                <div class="value-prop-new">
+                                    <div class="value-prop-number-new">02</div>
+                                    <h3>Natural Gas Auctions</h3>
+                                    <p>Same competitive auction process for your natural gas supply, maximizing your savings on heating and operations.</p>
+                                </div>
+
+                                <div class="value-prop-new">
+                                    <div class="value-prop-number-new">03</div>
+                                    <h3>Expert Guidance</h3>
+                                    <p>Our energy specialists guide you through the entire process, from contract analysis to provider selection and ongoing support.</p>
+                                </div>
+                            </div>
+
+                            <div class="hero-cta-new">
+                                <button class="get-started-btn-hero" id="get-started-btn">Get Started</button>
+                                <p class="hero-tagline-new">Free consultation - No obligation</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 3: Interactive US Map -->
+                <section class="landing-section content-section-new white-section">
+                    <div class="section-card">
+                        <div class="content-section-header-new">
+                            <h2 class="content-section-title-new">Where Ideal Can Help You</h2>
+                        </div>
+                        <div class="content-section-body">
+                            <p>Energy deregulation varies by state. See if you're in a market where Ideal can help you save.</p>
+
+                            <!-- US Energy Deregulation Map -->
+                            <div class="deregulation-map-container">
+                                <p class="map-description">Hover over states below to see their electricity and natural gas deregulation status.</p>
+
+                                <div class="us-map-wrapper">
+                                    <!-- SVG map loaded dynamically from external file -->
+                                    <div id="us-map-container"></div>
+
+                                    <!-- State Tooltip -->
+                                    <div class="state-tooltip" id="state-tooltip"></div>
+                                </div>
+
+                                <!-- Map Legend -->
+                                <div class="map-legend">
+                                    <div class="legend-item">
+                                        <span class="legend-color deregulated"></span>
+                                        <span class="legend-label">Full Access (Both)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-color electricity-only"></span>
+                                        <span class="legend-label">Electric Only</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-color gas-only"></span>
+                                        <span class="legend-label">Gas Only</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-color partial"></span>
+                                        <span class="legend-label">Limited Access</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-color regulated"></span>
+                                        <span class="legend-label">Not Available</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 4: Ideal Price Discovery Platform -->
+                <section class="landing-section content-section-new blue-section">
+                    <div class="section-card">
+                        <div class="content-section-header-new">
+                            <h2 class="content-section-title-new">The Ideal Price Discovery Platform</h2>
+                        </div>
+                        <div class="content-section-body">
+                            <p>Ideal has developed The Ideal Price Discovery Platform that guarantees two things: <strong>lowest price to the energy customer</strong> and <strong>complete transparency</strong>.</p>
+
+                            <p>IES works with our clients, employing a reverse auction to ensure 40+ energy providers bid for the prices at which they are willing to sell. Through our auction process, energy providers competing for your business see each other's prices as they are submitted to auction (no names, just price). As the customer, you can also watch each downtick in price. The process is totally transparent.</p>
+
+                            <h3 style="margin-top: 32px;">Comprehensive Energy Solutions</h3>
+                            <p>Ideal has the experience and expertise to handle any of your energy needs – natural gas, electricity, propane, and/or fuel. We have a variety of different purchasing strategies to implement depending on your operational factors. Often, a fully fixed rate is the best option. But we also have blocked index, index, and wholesale pricing structures available.</p>
+
+                            <div class="energy-types-grid">
+                                <div class="energy-type-item">
+                                    <img src="https://static.wixstatic.com/media/07120a_0d6755e84977488a8a3fdc7046503b13~mv2.png/v1/fill/w_370,h_370,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/gas-icon_edited_edited.png" alt="Natural Gas" class="energy-type-icon">
+                                    <span class="energy-type-label">Natural Gas</span>
+                                </div>
+                                <div class="energy-type-item">
+                                    <img src="https://static.wixstatic.com/media/07120a_1d6ff065736543c2b9ea02544ed16f8a~mv2.png/v1/fill/w_366,h_370,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/electric-icon_edited.png" alt="Electricity" class="energy-type-icon">
+                                    <span class="energy-type-label">Electricity</span>
+                                </div>
+                                <div class="energy-type-item">
+                                    <img src="https://static.wixstatic.com/media/07120a_52b820f84f1e4ecb8d446a2bf342c367~mv2.png/v1/fill/w_370,h_370,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/fuel-oil-icon_edited.png" alt="Fuel Oil" class="energy-type-icon">
+                                    <span class="energy-type-label">Fuel Oil</span>
+                                </div>
+                                <div class="energy-type-item">
+                                    <img src="https://static.wixstatic.com/media/07120a_c3d32bcb38f84fe79b4688e91289d089~mv2.png/v1/fill/w_386,h_370,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/propane-icon_edited.png" alt="Propane" class="energy-type-icon">
+                                    <span class="energy-type-label">Propane</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 5: Understanding Deregulation -->
+                <section class="landing-section content-section-new white-section">
+                    <div class="section-card">
+                        <div class="content-section-header-new">
+                            <h2 class="content-section-title-new">Understanding Energy Deregulation</h2>
+                        </div>
+                        <div class="content-section-body">
+                            <h3>What Is Energy Deregulation?</h3>
+                            <p>Traditionally, electric companies have been vertical organizations who control all stages of the energy delivery process: generation, transmission, distribution, metering and billing. In other words, they operate as monopolies under federal and state regulation.</p>
+
+                            <p>When a state deregulates its electric sector, these monopolies are broken down and different companies participate in the energy delivery process:</p>
+
+                            <ul class="content-section-list-new">
+                                <li><strong>Private Generators</strong> compete to sell their electricity output in a wholesale market</li>
+                                <li><strong>Retail Electric Providers (REP)</strong> purchase wholesale energy and resell it to homes and businesses in the form of electricity plans</li>
+                                <li><strong>Transmission and Distribution Utilities (TDU)</strong> manage the grid infrastructure and deliver energy to your property</li>
+                            </ul>
+
+                            <h3 style="margin-top: 32px;">Benefits of Deregulation</h3>
+                            <p>The main advantage of having a deregulated energy sector is being able to choose your provider. When done right, deregulation offers:</p>
+
+                            <ul class="content-section-list-new">
+                                <li><strong>Power Bill Savings:</strong> Choose the right electricity plan and a provider you can trust</li>
+                                <li><strong>Plan Flexibility:</strong> Select electricity plans according to your preferences, including 100% renewable options</li>
+                                <li><strong>Added Perks:</strong> Some plans come with incentives like smart thermostats or solar credits</li>
+                                <li><strong>Competition-Driven Prices:</strong> Providers compete for your business, driving down costs</li>
+                            </ul>
+
+                            <h3 style="margin-top: 32px;">How the Wholesale Market Works</h3>
+                            <p>When electricity is deregulated, the wholesale market operates like a reverse auction. Just like the highest bidder wins in a normal auction, the seller with the lowest price wins in a reverse auction. This is where Ideal comes in - we leverage this competitive market structure to get you the best rates possible.</p>
+
+                            <p>Consider that deregulation only applies for electricity generation and retail sales. Transmission and distribution are still a regulated monopoly - in a given area, a single company manages the power lines, transmission towers, utility poles, transformers, substations, etc. Generation companies compete to sell their electricity, while retailers compete to resell that power to you. However, they all use the same power grid.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 5: Footer -->
+                <footer class="landing-footer-new landing-footer-compact">
+                    <div class="footer-content-new">
+                        <div class="footer-column footer-brand">
+                            <h4>Ideal</h4>
+                            <p>Your trusted energy procurement partner.</p>
+                        </div>
+                        <div class="footer-column footer-quick-links">
+                            <ul class="footer-links footer-links-inline">
+                                <li><a href="#" class="footer-link" data-tab="home">Home</a></li>
+                                <li><a href="#" class="footer-link" data-tab="about">About</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column footer-contact-col">
+                            <p class="footer-contact">
+                                <a href="mailto:info@idealenergy.com">info@idealenergy.com</a>
+                            </p>
+                        </div>
+                    </div>
+                </footer>
+
+            </div>
+        </div>
+
+        <!-- About Tab Content -->
+        <div class="tab-content" id="about-tab">
+            <div class="page-hero">
+                <div class="page-hero-overlay"></div>
+                <div class="page-hero-content">
+                    <h1 class="page-hero-title">About Ideal</h1>
+                    <p class="page-hero-subtitle">Your trusted partner in navigating deregulated energy markets to reduce costs and optimize your energy contracts.</p>
+                </div>
+            </div>
+            <div class="landing-container">
+                <div class="about-content">
+                    <div class="about-section">
+                        <h3>Our Mission</h3>
+                        <p>Ideal was founded to help homes and businesses take control of their energy costs. In deregulated markets, you have the power to choose your energy provider - but navigating the options can be overwhelming. That's where we come in.</p>
+                        <p>We leverage our expertise and industry relationships to auction your energy contracts to multiple providers, ensuring you get the most competitive rates available. Our goal is simple: save you money on electricity and natural gas while providing expert guidance every step of the way.</p>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>How It Works</h3>
+                        <div class="how-it-works-grid">
+                            <div class="how-it-works-step">
+                                <div class="step-number">1</div>
+                                <h4>Share Your Info</h4>
+                                <p>Tell us about your location and current energy usage. We'll verify you're in a deregulated market where we can help.</p>
+                            </div>
+                            <div class="how-it-works-step">
+                                <div class="step-number">2</div>
+                                <h4>We Analyze</h4>
+                                <p>Our team reviews your energy profile and identifies opportunities for savings in your specific market.</p>
+                            </div>
+                            <div class="how-it-works-step">
+                                <div class="step-number">3</div>
+                                <h4>Competitive Auction</h4>
+                                <p>We auction your contract to multiple energy providers, creating competition that drives down your rates.</p>
+                            </div>
+                            <div class="how-it-works-step">
+                                <div class="step-number">4</div>
+                                <h4>You Save</h4>
+                                <p>Review the best offers and choose the plan that works for you. We handle the transition seamlessly.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>Why Choose Ideal?</h3>
+                        <div class="why-choose-grid">
+                            <div class="why-choose-item">
+                                <h4>Free Service</h4>
+                                <p>Our consultation is completely free. We only succeed when you save.</p>
+                            </div>
+                            <div class="why-choose-item">
+                                <h4>Market Expertise</h4>
+                                <p>Deep knowledge of deregulated energy markets across the country.</p>
+                            </div>
+                            <div class="why-choose-item">
+                                <h4>Competitive Process</h4>
+                                <p>Our auction approach ensures you get the best available rates.</p>
+                            </div>
+                            <div class="why-choose-item">
+                                <h4>Ongoing Support</h4>
+                                <p>We're here to help throughout your contract term and beyond.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>Markets We Serve</h3>
+                        <p>Ideal operates in states with deregulated electricity and/or natural gas markets. Our services are available where you have the power to choose your energy provider, including major markets in Texas, Pennsylvania, Ohio, Illinois, New York, and more.</p>
+                        <p>Not sure if your state qualifies? <a href="#" class="footer-link" data-tab="home" style="color: var(--primary-orange);">Check our interactive map</a> or start the qualification process to find out.</p>
+                    </div>
+                </div>
+
+                <!-- Footer Section -->
+                <footer class="landing-footer-new landing-footer-compact">
+                    <div class="footer-content-new">
+                        <div class="footer-column footer-brand">
+                            <h4>Ideal</h4>
+                            <p>Your trusted energy procurement partner.</p>
+                        </div>
+                        <div class="footer-column footer-quick-links">
+                            <ul class="footer-links footer-links-inline">
+                                <li><a href="#" class="footer-link" data-tab="home">Home</a></li>
+                                <li><a href="#" class="footer-link" data-tab="about">About</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-column footer-contact-col">
+                            <p class="footer-contact">
+                                <a href="mailto:info@idealenergy.com">info@idealenergy.com</a>
+                            </p>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container" id="app-container" style="display: none;">
+        <!-- Header with Navigation -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <button class="back-button" id="back-btn" disabled>
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <div class="logo">
+                        <div class="logo-text">Ideal: <span class="tagline-inline">Take control of your energy future</span></div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="start-over-btn" id="start-over-btn">Start Over</button>
+                    <div class="step-indicator" id="step-indicator">1/5</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar-container">
+            <div class="progress-bar">
+                <div class="progress-bar-fill" id="progress-fill" style="width: 20%"></div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="question-container" id="question-container">
+                <!-- Questions will be dynamically inserted here -->
+            </div>
+        </main>
+
+        <!-- Footer Navigation -->
+        <footer class="footer-nav">
+            <div class="footer-content" id="footer-buttons">
+                <button class="nav-button next" id="next-btn" disabled>Next</button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- State Blocked Modal -->
+    <div class="popup-overlay" id="state-blocked-overlay">
+        <div class="popup-card">
+            <div class="popup-header">
+                <h3 class="popup-title" id="state-blocked-title">Energy Choice Not Available</h3>
+                <button class="popup-close" id="state-blocked-close">&times;</button>
+            </div>
+            <div class="popup-content" id="state-blocked-content">
+                <p>Unfortunately, your state does not have deregulated energy markets, which means Ideal cannot help you auction your energy contracts at this time.</p>
+                <p style="margin-top: 16px;">However, there are still ways to reduce your energy costs and harness sustainable energy solutions!</p>
+                <div style="margin-top: 24px; text-align: center;">
+                    <a href="https://qtyree1328.github.io/Snapshot_demo/" class="nav-button next" style="display: inline-block; text-decoration: none; padding: 14px 28px;">Explore Other Options</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Limited Access Modal -->
+    <div class="popup-overlay" id="limited-access-overlay">
+        <div class="popup-card">
+            <div class="popup-header">
+                <h3 class="popup-title">Limited Energy Choice Available</h3>
+                <button class="popup-close" id="limited-access-close">&times;</button>
+            </div>
+            <div class="popup-content" id="limited-access-content">
+                <p>Your state has <strong>limited</strong> energy deregulation. While not all areas or customer types may be eligible, Ideal is the best partner to help you navigate these opportunities.</p>
+                <p style="margin-top: 16px;">We'll work with you to determine if you qualify and find the best available options in your market.</p>
+                <div style="margin-top: 24px; text-align: center;">
+                    <button class="nav-button next" id="continue-limited-btn" style="padding: 14px 28px;">Continue with Ideal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="popup-overlay" id="success-overlay">
+        <div class="popup-card" style="max-width: 520px;">
+            <div class="popup-header">
+                <h3 class="popup-title" style="color: #22c55e;">Submission Successful!</h3>
+            </div>
+            <div class="popup-content" id="success-content">
+                <p style="text-align: center; font-size: 16px;">Thank you for your interest in Ideal! Our team will review your information and reach out shortly.</p>
+                <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+                    <button class="nav-button next" id="download-profile-btn" style="padding: 14px 28px; background: #1e3a5f;">Download Lead Profile</button>
+                    <button class="nav-button skip" id="return-home-btn" style="padding: 14px 28px;">Return Home</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Popup Modal -->
+    <div class="popup-overlay" id="popup-overlay">
+        <div class="popup-card">
+            <div class="popup-header">
+                <h3 class="popup-title" id="popup-title">Title</h3>
+                <button class="popup-close" id="popup-close">&times;</button>
+            </div>
+            <div class="popup-content" id="popup-content">
+                Content goes here
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loading-text">Processing...</div>
+        <div class="loading-subtext">Please wait</div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Notification</div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
