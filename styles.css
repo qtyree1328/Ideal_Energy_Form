@@ -465,29 +465,33 @@ body {
 
 @media (max-width: 768px) {
   .energy-types-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-
-  .energy-type-icon {
-    width: 60px;
-    height: 60px;
-  }
-
-  .energy-type-label {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .energy-types-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
   }
 
   .energy-type-icon {
     width: 50px;
     height: 50px;
+  }
+
+  .energy-type-label {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .energy-types-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .energy-type-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .energy-type-label {
+    font-size: 9px;
   }
 }
 
@@ -686,7 +690,7 @@ body {
   }
 
   .landing-logo {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .landing-nav-center {
@@ -717,36 +721,52 @@ body {
     gap: 16px;
   }
 
+  /* Hero section - remove full viewport height on mobile */
+  .hero-section-new {
+    min-height: auto;
+  }
+
   .hero-content-new {
-    padding: 32px 16px;
+    padding: 40px 16px;
   }
 
   .hero-title-new {
-    font-size: 24px;
+    font-size: 28px;
   }
 
   .hero-subtitle-new {
-    font-size: 14px;
-    margin-bottom: 24px;
+    font-size: 15px;
+    margin-bottom: 28px;
   }
 
+  /* Value props - stack vertically on mobile */
   .value-props-new {
+    flex-direction: column;
     gap: 10px;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
+    overflow-x: visible;
   }
 
   .value-prop-new {
-    min-width: 200px;
-    min-height: 180px;
-    padding: 20px 14px 28px;
+    min-width: 100%;
+    width: 100%;
+    min-height: auto;
+    padding: 16px 16px 18px;
   }
 
   .value-prop-new h3 {
-    font-size: 13px;
+    font-size: 14px;
+    margin-bottom: 6px;
   }
 
   .value-prop-new p {
     font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .value-prop-number-new {
+    font-size: 10px;
+    margin-bottom: 8px;
   }
 
   .get-started-btn-hero {
