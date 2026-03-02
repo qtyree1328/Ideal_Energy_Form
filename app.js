@@ -1,5 +1,6 @@
 // Ideal Energy - Main Application
 import { checkIdealEligibility, getAvailableAuctionTypes, getStateTooltipInfo, getStateClass, STATE_DATA } from './deregulated-states.js';
+import { captureReferral, submitLeadToFirebase, getStoredReferral } from './firebase.js';
 
 // Form steps for Ideal
 const STEPS = {
@@ -54,6 +55,9 @@ let map, marker;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
+  // Capture referral source from URL params immediately
+  captureReferral();
+
   initElements();
   initLandingPage();
   initMap();
@@ -630,7 +634,6 @@ function renderAuctionTypeStep() {
 // STEP 3: Property Type
 function renderPropertyTypeStep() {
   const options = [
-    { value: 'residential', label: 'Residential', description: 'Single-family home, apartment, or condo' },
     { value: 'commercial', label: 'Commercial', description: 'Office, retail, or service business' },
     { value: 'industrial', label: 'Industrial', description: 'Manufacturing, warehouse, or distribution' },
     { value: 'multifamily', label: 'Multi-Family', description: 'Apartment building or housing complex' }
@@ -1082,27 +1085,41 @@ function handleStartOver() {
   window.scrollTo(0, 0);
 }
 
-function handleSubmit() {
+async function handleSubmit() {
   showLoading('Submitting your information...');
 
-  // Simulate submission delay
-  setTimeout(() => {
+  try {
+    // Submit to Firebase
+    const result = await submitLeadToFirebase(userData);
+
     hideLoading();
 
-    // Save to localStorage for demo purposes
-    const submission = {
-      id: Date.now(),
-      ...userData,
-      submittedAt: new Date().toISOString()
-    };
+    if (result.success) {
+      console.log('Lead submitted successfully! ID:', result.leadId);
 
-    const submissions = JSON.parse(localStorage.getItem('ideal_submissions') || '[]');
-    submissions.push(submission);
-    localStorage.setItem('ideal_submissions', JSON.stringify(submissions));
+      // Also save to localStorage as backup
+      const submission = {
+        id: result.leadId,
+        ...userData,
+        submittedAt: new Date().toISOString(),
+        referral: getStoredReferral()
+      };
 
-    // Show success modal
-    showModal(successOverlay);
-  }, 1500);
+      const submissions = JSON.parse(localStorage.getItem('ideal_submissions') || '[]');
+      submissions.push(submission);
+      localStorage.setItem('ideal_submissions', JSON.stringify(submissions));
+
+      // Show success modal
+      showModal(successOverlay);
+    } else {
+      console.error('Submission failed:', result.error);
+      showToast('There was an error submitting your information. Please try again.', 'error');
+    }
+  } catch (error) {
+    hideLoading();
+    console.error('Submission error:', error);
+    showToast('There was an error submitting your information. Please try again.', 'error');
+  }
 }
 
 function downloadProfile() {
@@ -1113,7 +1130,6 @@ function downloadProfile() {
                           userData.auctionType === 'electricity' ? 'Electricity Only' : 'Natural Gas Only';
 
   const propertyTypeText = {
-    residential: 'Residential',
     commercial: 'Commercial',
     industrial: 'Industrial',
     multifamily: 'Multi-Family'

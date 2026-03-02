@@ -1,0 +1,9 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow uploads to leads folder
+    match /leads/{leadId}/{allPaths=**} {
+      allow read, write: if true;
+    }
+  }
+}

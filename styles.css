@@ -108,6 +108,29 @@ body {
   color: var(--primary-orange);
 }
 
+/* Logo images */
+.nav-logo-img {
+  height: 40px;
+  width: auto;
+}
+
+.footer-logo-img {
+  height: 36px;
+  width: auto;
+  margin-bottom: 8px;
+}
+
+.form-header-logo {
+  height: 32px;
+  width: auto;
+}
+
+.success-logo-img {
+  height: 48px;
+  width: auto;
+  opacity: 0.8;
+}
+
 .landing-nav-center {
   position: absolute;
   left: 50%;
@@ -527,12 +550,13 @@ body {
    SECTION 6: FOOTER
    ========================================== */
 .landing-footer-new {
-  background: var(--primary-navy);
-  color: white;
-  padding: 40px 24px 20px;
+  background: white;
+  color: var(--text-primary);
+  padding: 16px 24px;
   margin-top: 24px;
   width: 100vw;
   margin-left: calc(-50vw + 50%);
+  border-top: 1px solid #e5e7eb;
 }
 
 /* Compact footer variant */
@@ -560,7 +584,7 @@ body {
 
 .landing-footer-compact .footer-brand p {
   font-size: 12px;
-  color: rgba(255,255,255,0.6);
+  color: var(--text-secondary);
 }
 
 .footer-links-inline {
@@ -579,11 +603,11 @@ body {
 
 /* Compact footer inside landing-container (Partners/About pages) */
 .landing-container .landing-footer-compact {
-  margin-left: -40px;
-  margin-right: -40px;
-  margin-bottom: -60px;
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 0;
   border-radius: 0;
-  width: calc(100% + 80px);
+  width: 100%;
 }
 
 .footer-content-new {
@@ -598,13 +622,13 @@ body {
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 14px;
-  color: white;
+  color: var(--primary-navy);
 }
 
 .footer-column p {
   font-size: 14px;
   line-height: 1.6;
-  color: rgba(255,255,255,0.7);
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -617,7 +641,7 @@ body {
 }
 
 .footer-link {
-  color: rgba(255,255,255,0.7);
+  color: var(--text-secondary);
   text-decoration: none;
   font-size: 14px;
 }
@@ -632,7 +656,7 @@ body {
 }
 
 .footer-contact a:hover {
-  color: white;
+  color: var(--primary-navy);
 }
 
 .footer-bottom-new {
@@ -691,6 +715,18 @@ body {
 
   .landing-logo {
     font-size: 18px;
+  }
+
+  .nav-logo-img {
+    height: 28px;
+  }
+
+  .footer-logo-img {
+    height: 28px;
+  }
+
+  .form-header-logo {
+    height: 24px;
   }
 
   .landing-nav-center {
@@ -820,10 +856,10 @@ body {
 
   /* Footer inside landing-container on mobile */
   .landing-container .landing-footer-compact {
-    margin-left: -20px;
-    margin-right: -20px;
-    margin-bottom: -40px;
-    width: calc(100% + 40px);
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    width: 100%;
   }
 }
 
