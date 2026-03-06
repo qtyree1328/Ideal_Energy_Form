@@ -1,0 +1,390 @@
+IDEAL ENERGY SOLUTIONS - WEBSITE CONTENT
+==========================================
+This document contains all section titles and text from the website.
+Edit the text below and share changes with the team.
+
+
+================================================================
+HOME PAGE
+================================================================
+
+
+--- NAVIGATION ---
+
+Logo: Ideal Energy
+Button: Get Started
+Tab: About
+
+
+--- HERO SECTION ---
+
+Title:
+Take control of your energy future
+
+Subtitle:
+IES is your trusted energy procurement partner. We help businesses reduce their electricity and natural gas costs through competitive market auctions in deregulated states.
+
+Value Prop 01 - Electricity Auctions:
+We auction your electricity contract to multiple providers, ensuring you get the most competitive rates available in your market.
+
+Value Prop 02 - Natural Gas Auctions:
+Same competitive auction process for your natural gas supply, maximizing your savings on heating and operations.
+
+Value Prop 03 - Expert Guidance:
+Our energy specialists guide you through the entire process, from contract analysis to provider selection and ongoing support.
+
+CTA Button: Get Started
+CTA Tagline: Free consultation - No obligation
+
+
+--- WHERE IES CAN HELP YOU (Interactive Map Section) ---
+
+Title:
+Where IES Can Help You
+
+Description:
+Energy deregulation varies by state. See if you're in a market where IES can help you save.
+
+Map Instructions:
+Hover over states below to see their electricity and natural gas deregulation status.
+
+Map Legend:
+  - Full Access (Both)
+  - Electric Only
+  - Gas Only
+  - Limited Access
+  - Not Available
+
+
+--- THE IES PRICE DISCOVERY PLATFORM ---
+
+Title:
+The IES Price Discovery Platform
+
+Paragraph 1:
+IES has developed The IES Price Discovery Platform that guarantees two things: lowest price to the energy customer and complete transparency.
+
+Paragraph 2:
+IES forms a centralized strategy between the client and their dedicated consultant to reduce cost and consumption through competition. Through the process of an online utility auction, the true bottom price is discovered not only for one supplier, but for all participating and vetted suppliers. Once the bidding stops between all 40 suppliers, you know that the last bid is as low as anyone can go. Utilizing the head-to-head competition between 40+ suppliers ensures the cheapest rate in the market. Suppliers want you to call them and only them, and take their first offer; they definitely do not like having to compete head-to-head, bidding multiple times for your business. That shaves off their "in-house" margin and allows for lower executable price points through our online auction!
+
+Sub-Title:
+Comprehensive Energy Solutions
+
+Paragraph 3:
+IES has the experience and expertise to handle any of your energy needs – natural gas, electricity, propane, and/or fuel. We have a variety of different purchasing strategies to implement depending on your operational factors. Often, a fully fixed rate is the best option. But we also have blocked index, index, and wholesale pricing structures available.
+
+Energy Types Listed:
+  - Natural Gas
+  - Electricity
+  - Fuel Oil
+  - Propane
+
+
+--- UNDERSTANDING ENERGY DEREGULATION ---
+
+Title:
+Understanding Energy Deregulation
+
+Sub-Title 1:
+What Is Energy Deregulation?
+
+Paragraph 1:
+Traditionally, electric companies have been vertical organizations who control all stages of the energy delivery process: generation, transmission, distribution, metering and billing. In other words, they operate as monopolies under federal and state regulation.
+
+Paragraph 2:
+When a state deregulates its electric sector, these monopolies are broken down and different companies participate in the energy delivery process:
+
+Bullet Points:
+  - Private Generators compete to sell their electricity output in a wholesale market
+  - Retail Electric Providers (REP) purchase wholesale energy and resell it to businesses in the form of electricity plans
+  - Transmission and Distribution Utilities (TDU) manage the grid infrastructure and deliver energy to your property
+
+Sub-Title 2:
+Benefits of Deregulation
+
+Paragraph 3:
+The main advantage of having a deregulated energy sector is being able to choose your provider. When done right, deregulation offers:
+
+Bullet Points:
+  - Power Bill Savings: Choose the right electricity plan and a provider you can trust
+  - Plan Flexibility: Select electricity plans according to your preferences, including 100% renewable options
+  - Added Perks: Some plans come with incentives like smart thermostats or solar credits
+  - Competition-Driven Prices: Providers compete for your business, driving down costs
+
+Sub-Title 3:
+How the Wholesale Market Works
+
+Paragraph 4:
+When electricity is deregulated, the wholesale market operates like a reverse auction. Just like the highest bidder wins in a normal auction, the seller with the lowest price wins in a reverse auction. This is where IES comes in - we leverage this competitive market structure to get you the best rates possible.
+
+Paragraph 5:
+Consider that deregulation only applies for electricity generation and retail sales. Transmission and distribution are still a regulated monopoly - in a given area, a single company manages the power lines, transmission towers, utility poles, transformers, substations, etc. Generation companies compete to sell their electricity, while retailers compete to resell that power to you. However, they all use the same power grid.
+
+
+--- FOOTER ---
+
+Tagline:
+Your trusted energy procurement partner.
+
+Links:
+  - Home
+  - About
+
+Contact Email:
+idealenergyforms@gmail.com
+
+
+
+================================================================
+ABOUT PAGE
+================================================================
+
+
+--- PAGE HERO ---
+
+Title:
+About Ideal Energy Solutions
+
+Subtitle:
+Your trusted partner in navigating deregulated energy markets to reduce costs and optimize your energy contracts.
+
+
+--- OUR MISSION ---
+
+Title:
+Our Mission
+
+Paragraph 1:
+Ideal was founded to help businesses take control of their energy costs. In deregulated markets, you have the power to choose your energy provider - but navigating the options can be overwhelming. That's where we come in.
+
+Paragraph 2:
+We leverage our expertise and industry relationships to auction your energy contracts to multiple providers, ensuring you get the most competitive rates available. Our goal is simple: save you money on electricity and natural gas while providing expert guidance every step of the way.
+
+
+--- HOW IT WORKS ---
+
+Title:
+How It Works
+
+Step 1 - Share Your Info:
+Tell us about your location and current energy usage. We'll verify you're in a deregulated market where we can help.
+
+Step 2 - We Analyze:
+Our team reviews your energy profile and identifies opportunities for savings in your specific market.
+
+Step 3 - Competitive Auction:
+We auction your contract to multiple energy providers, creating competition that drives down your rates.
+
+Step 4 - You Save:
+Review the best offers and choose the plan that works for you. We handle the transition seamlessly.
+
+
+--- WHY CHOOSE IDEAL? ---
+
+Title:
+Why Choose Ideal?
+
+Free Service:
+Our consultation is completely free. We only succeed when you save.
+
+Market Expertise:
+Deep knowledge of deregulated energy markets across the country.
+
+Competitive Process:
+Our auction approach ensures you get the best available rates.
+
+Ongoing Support:
+We're here to help throughout your contract term and beyond.
+
+
+--- MARKETS WE SERVE ---
+
+Title:
+Markets We Serve
+
+Paragraph 1:
+Ideal operates in states with deregulated electricity and/or natural gas markets. Our services are available where you have the power to choose your energy provider, including major markets in Texas, Pennsylvania, Ohio, Illinois, New York, and more.
+
+Paragraph 2:
+Not sure if your state qualifies? Check our interactive map or start the qualification process to find out.
+
+
+--- ABOUT PAGE FOOTER ---
+
+Contact Email:
+info@idealenergy.com
+
+
+
+================================================================
+QUESTIONNAIRE / FORM
+================================================================
+
+
+--- STEP 1: LOCATION ---
+
+Title:
+Where is your property located?
+
+Subtitle:
+Enter your address to check if energy choice is available in your area.
+
+Buttons: Search | Modify Pin | Confirm Location
+
+
+--- STEP 2: AUCTION TYPE ---
+
+Title:
+What would you like to auction?
+
+Subtitle:
+Select the energy services you want Ideal to help you with.
+
+Option 1 - Both Electricity & Natural Gas:
+Auction both your electricity and natural gas contracts for maximum savings
+
+Option 2 - Electricity Only:
+Auction your electricity contract to competitive providers
+
+Option 3 - Natural Gas Only:
+Auction your natural gas contract to competitive providers
+
+
+--- STEP 3: PROPERTY TYPE ---
+
+Title:
+What type of property is this?
+
+Subtitle:
+This helps us match you with the right providers.
+
+Option 1 - Commercial:
+Office, retail, or service business
+
+Option 2 - Industrial:
+Manufacturing, warehouse, or distribution
+
+Option 3 - Multi-Family:
+Apartment building or housing complex
+
+
+--- STEP 4: ENERGY BILLS ---
+
+Title:
+What are your current energy costs?
+
+Subtitle:
+This helps us estimate your potential savings.
+
+Field Labels:
+  - Current Primary Energy Source
+  - Average Monthly Electricity Bill (range: $50 - $5,000+)
+  - Average Monthly Natural Gas Bill (range: $0 - $2,000+)
+
+Energy Source Options:
+  - Grid Electricity
+  - Solar
+  - Natural Gas
+  - Propane
+  - Oil
+  - Mixed Sources
+
+Note:
+These estimates help us understand your energy profile. We'll get exact figures from your utility bills during the auction process.
+
+
+--- STEP 5: PROPERTY & UTILITY DETAILS ---
+
+Title:
+Property & Utility Details
+
+Subtitle:
+Help us understand your property and current utility setup.
+
+Field Labels:
+  - Do you own this property?
+  - Name of Electric Utility (placeholder: e.g., Pacific Gas and Electric)
+  - Retail Energy Provider (if different than utility) (placeholder: e.g., Direct Energy)
+
+Ownership Options:
+  - Yes, I own this property
+  - No, I rent/lease this property
+  - I manage this property for the owner
+
+Additional Details Sub-Section:
+  Title: Additional Details
+  Subtitle: These help us better prepare paths for your energy procurement. All fields are optional.
+
+  Field Labels:
+    - Energy Charges (per kWh) (range: $0.00 - $0.50)
+    - Demand Charges (per kW) (range: $0 - $50)
+
+  Document Uploads:
+    - Letter of Authorization (LOA)
+    - Letter of Enrollment (LOE)
+    - Copy of Last Energy Bill
+    - Copy of Current Energy Contract
+
+
+--- STEP 6: CONTACT INFORMATION ---
+
+Title:
+How can we reach you?
+
+Subtitle:
+Enter your contact information and our team will be in touch shortly.
+
+Field Labels:
+  - Full Name * (placeholder: John Smith)
+  - Email Address * (placeholder: john@example.com)
+  - Phone Number (optional) (placeholder: (555) 555-5555)
+
+Info Note:
+What happens next? An Ideal energy specialist will review your information and contact you within 1-2 business days to discuss your options and potential savings.
+
+
+
+================================================================
+MODALS / POPUPS
+================================================================
+
+
+--- STATE BLOCKED MODAL ---
+
+Title:
+Energy Choice Not Available
+
+Paragraph 1:
+Unfortunately, your state does not have deregulated energy markets, which means Ideal cannot help you auction your energy contracts at this time.
+
+Paragraph 2:
+However, there are still ways to reduce your energy costs and harness sustainable energy solutions!
+
+Button: Explore Other Options
+
+
+--- LIMITED ACCESS MODAL ---
+
+Title:
+Limited Energy Choice Available
+
+Paragraph 1:
+Your state has limited energy deregulation. While not all areas or customer types may be eligible, Ideal is the best partner to help you navigate these opportunities.
+
+Paragraph 2:
+We'll work with you to determine if you qualify and find the best available options in your market.
+
+Button: Continue with Ideal
+
+
+--- SUCCESS MODAL ---
+
+Title:
+Submission Successful!
+
+Message:
+Thank you for your interest in Ideal! Our team will review your information and reach out shortly.
+
+Buttons:
+  - Download Lead Profile
+  - Return Home

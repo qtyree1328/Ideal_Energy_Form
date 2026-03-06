@@ -52,7 +52,7 @@ exports.sendLeadEmail = onDocumentCreated(
     // Send the email
     const mailOptions = {
       from: '"Ideal Energy Leads" <idealenergyforms@gmail.com>',
-      to: "idealenergyforms@gmail.com",
+      to: "idealenergyforms@gmail.com, Andy@automate.my",
       subject: `New Lead: ${leadData.contact?.name || "Unknown"} - ${leadData.location?.state || "Unknown State"}`,
       html: emailHtml,
       attachments: attachments,

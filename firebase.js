@@ -81,7 +81,7 @@ async function uploadFile(file, leadId, fileType) {
 }
 
 // Submit lead to Firebase
-export async function submitLeadToFirebase(userData) {
+export async function submitLeadToFirebase(userData, signedDocuments = {}) {
   try {
     // Get referral data
     const referral = getStoredReferral();
@@ -93,17 +93,21 @@ export async function submitLeadToFirebase(userData) {
     const files = userData.additionalDetails?.files || {};
     const uploadedFiles = {};
 
-    if (files.loa) {
-      uploadedFiles.loa = await uploadFile(files.loa, leadId, 'loa');
-    }
-    if (files.loe) {
-      uploadedFiles.loe = await uploadFile(files.loe, leadId, 'loe');
-    }
     if (files.energyBill) {
       uploadedFiles.energyBill = await uploadFile(files.energyBill, leadId, 'energy_bill');
     }
     if (files.energyContract) {
       uploadedFiles.energyContract = await uploadFile(files.energyContract, leadId, 'energy_contract');
+    }
+
+    // Upload signed documents (LOA/LOE PDFs)
+    if (signedDocuments?.loa?.pdfBytes) {
+      const loaFile = new File([signedDocuments.loa.pdfBytes], 'LOA_signed.pdf', { type: 'application/pdf' });
+      uploadedFiles.loa = await uploadFile(loaFile, leadId, 'loa_signed');
+    }
+    if (signedDocuments?.loe?.pdfBytes) {
+      const loeFile = new File([signedDocuments.loe.pdfBytes], 'LOE_signed.pdf', { type: 'application/pdf' });
+      uploadedFiles.loe = await uploadFile(loeFile, leadId, 'loe_signed');
     }
 
     // Now create the lead document WITH files already included
@@ -130,26 +134,20 @@ export async function submitLeadToFirebase(userData) {
       service: {
         auctionType: userData.auctionType || null,
         propertyType: userData.propertyType || null,
-        energySource: userData.energySource || null
-      },
-
-      // Bills
-      bills: {
-        electricity: userData.bills?.electricity || null,
-        gas: userData.bills?.gas || null
+        portfolioOver5k: userData.portfolioOver5k || null
       },
 
       // Property details
       propertyDetails: {
         ownsProperty: userData.propertyDetails?.ownsProperty || null,
-        electricUtility: userData.propertyDetails?.electricUtility || null,
-        retailProvider: userData.propertyDetails?.retailProvider || null
+        electricUtility: userData.propertyDetails?.electricUtility || null
       },
 
       // Additional details
       additionalDetails: {
-        energyCharges: userData.additionalDetails?.energyCharges || null,
-        demandCharges: userData.additionalDetails?.demandCharges || null
+        hasRetailContract: userData.additionalDetails?.hasRetailContract || null,
+        retailProvider: userData.additionalDetails?.retailProvider || null,
+        notes: userData.additionalDetails?.notes || null
       },
 
       // Referral tracking

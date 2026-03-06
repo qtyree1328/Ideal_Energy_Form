@@ -27,19 +27,16 @@ let userData = {
   location: null,
   auctionType: null,
   propertyType: null,
-  energySource: null,
-  bills: { electricity: 200, gas: 100 },
+  portfolioOver5k: null,
   propertyDetails: {
     ownsProperty: null,
-    electricUtility: '',
-    retailProvider: ''
+    electricUtility: ''
   },
   additionalDetails: {
-    energyCharges: null,
-    demandCharges: null,
+    hasRetailContract: null,
+    retailProvider: '',
+    notes: '',
     files: {
-      loa: null,
-      loe: null,
       energyBill: null,
       energyContract: null
     }
@@ -95,6 +92,32 @@ function initElements() {
     hideModal(limitedAccessOverlay);
     goToNextStep();
   });
+
+  document.getElementById('residential-close')?.addEventListener('click', () => {
+    hideModal(document.getElementById('residential-overlay'));
+  });
+  document.getElementById('residential-close-btn')?.addEventListener('click', () => {
+    hideModal(document.getElementById('residential-overlay'));
+  });
+
+  document.getElementById('spend-threshold-close')?.addEventListener('click', () => {
+    hideModal(document.getElementById('spend-threshold-overlay'));
+  });
+  document.getElementById('spend-threshold-close-btn')?.addEventListener('click', () => {
+    hideModal(document.getElementById('spend-threshold-overlay'));
+  });
+
+  // Signing modal buttons
+  document.getElementById('signing-close')?.addEventListener('click', () => {
+    hideModal(document.getElementById('signing-overlay'));
+    activeSigningDoc = null;
+  });
+  document.getElementById('signing-cancel')?.addEventListener('click', () => {
+    hideModal(document.getElementById('signing-overlay'));
+    activeSigningDoc = null;
+  });
+  document.getElementById('signing-submit')?.addEventListener('click', handleSigningSubmit);
+  document.getElementById('signing-name')?.addEventListener('input', updateSigningSubmitButton);
 
   document.getElementById('download-profile-btn')?.addEventListener('click', downloadProfile);
   document.getElementById('return-home-btn')?.addEventListener('click', () => {
@@ -267,6 +290,7 @@ function startQuestionnaire() {
   landingPage.style.display = 'none';
   appContainer.style.display = 'flex';
   currentStep = 0;
+  signedDocuments = { loa: null, loe: null };
   userData = {
     location: null,
     auctionType: null,
@@ -635,8 +659,7 @@ function renderAuctionTypeStep() {
 function renderPropertyTypeStep() {
   const options = [
     { value: 'commercial', label: 'Commercial', description: 'Office, retail, or service business' },
-    { value: 'industrial', label: 'Industrial', description: 'Manufacturing, warehouse, or distribution' },
-    { value: 'multifamily', label: 'Multi-Family', description: 'Apartment building or housing complex' }
+    { value: 'residential', label: 'Residential', description: 'Apartment building or housing complex' }
   ];
 
   const optionsHtml = options.map(opt => `
@@ -666,6 +689,15 @@ function renderPropertyTypeStep() {
       card.classList.add('selected');
       card.querySelector('input').checked = true;
       userData.propertyType = card.dataset.value;
+
+      if (card.dataset.value === 'residential') {
+        showModal(document.getElementById('residential-overlay'));
+        // Deselect so they can't proceed
+        card.classList.remove('selected');
+        card.querySelector('input').checked = false;
+        userData.propertyType = null;
+      }
+
       updateNextButton();
     });
   });
@@ -675,94 +707,51 @@ function renderPropertyTypeStep() {
 
 // STEP 4: Energy Bills
 function renderEnergyBillsStep() {
-  const auctionTypes = getAvailableAuctionTypes(userData.location?.state);
-  const showElectricity = userData.auctionType === 'electricity' || userData.auctionType === 'both';
-  const showGas = userData.auctionType === 'gas' || userData.auctionType === 'both';
-
-  const energySources = [
-    { value: '', label: 'Select energy source...' },
-    { value: 'grid_electricity', label: 'Grid Electricity' },
-    { value: 'solar', label: 'Solar' },
-    { value: 'natural_gas', label: 'Natural Gas' },
-    { value: 'propane', label: 'Propane' },
-    { value: 'oil', label: 'Oil' },
-    { value: 'mixed', label: 'Mixed Sources' }
+  const options = [
+    { value: 'yes', label: 'Yes', description: 'Our monthly energy portfolio spend is greater than $5,000' },
+    { value: 'no', label: 'No', description: 'Our monthly energy portfolio spend is less than $5,000' }
   ];
+
+  const optionsHtml = options.map(opt => `
+    <label class="option-card ${userData.portfolioOver5k === opt.value ? 'selected' : ''}" data-value="${opt.value}">
+      <input type="radio" name="portfolioSpend" value="${opt.value}" ${userData.portfolioOver5k === opt.value ? 'checked' : ''}>
+      <div class="option-content">
+        <div class="option-label">${opt.label}</div>
+        <div class="option-description">${opt.description}</div>
+      </div>
+      <div class="option-indicator"></div>
+    </label>
+  `).join('');
 
   questionContainer.innerHTML = `
     <div class="question-header">
-      <h2 class="question-title">What are your current energy costs?</h2>
-      <p class="question-subtitle">This helps us estimate your potential savings.</p>
+      <h2 class="question-title">What is your monthly portfolio energy spend?</h2>
+      <p class="question-subtitle">Is your total monthly energy spend greater than $5,000?</p>
     </div>
-    <div class="form-grid">
-      <div class="form-field">
-        <label class="form-label">Current Primary Energy Source</label>
-        <select class="form-select" id="energy-source-select">
-          ${energySources.map(src => `
-            <option value="${src.value}" ${userData.energySource === src.value ? 'selected' : ''}>${src.label}</option>
-          `).join('')}
-        </select>
-      </div>
-      ${showElectricity ? `
-        <div class="form-field">
-          <label class="form-label">Average Monthly Electricity Bill</label>
-          <div class="slider-container">
-            <div class="slider-header">
-              <span></span>
-              <span class="slider-value" id="electricity-value">$${userData.bills.electricity}</span>
-            </div>
-            <input type="range" class="slider-input" id="electricity-slider" min="50" max="5000" step="10" value="${userData.bills.electricity}">
-            <div class="slider-range">
-              <span>$50</span>
-              <span>$5,000+</span>
-            </div>
-          </div>
-        </div>
-      ` : ''}
-      ${showGas ? `
-        <div class="form-field">
-          <label class="form-label">Average Monthly Natural Gas Bill</label>
-          <div class="slider-container">
-            <div class="slider-header">
-              <span></span>
-              <span class="slider-value" id="gas-value">$${userData.bills.gas}</span>
-            </div>
-            <input type="range" class="slider-input" id="gas-slider" min="0" max="2000" step="10" value="${userData.bills.gas}">
-            <div class="slider-range">
-              <span>$0</span>
-              <span>$2,000+</span>
-            </div>
-          </div>
-        </div>
-      ` : ''}
-    </div>
-    <div class="info-note" style="margin-top: 24px; padding: 16px; background: #dbeafe; border-radius: 8px; font-size: 14px; color: #1e3a5f;">
-      <strong>Note:</strong> These estimates help us understand your energy profile. We'll get exact figures from your utility bills during the auction process.
+    <div class="options-grid">
+      ${optionsHtml}
     </div>
   `;
 
-  // Add event handlers
-  const energySourceSelect = document.getElementById('energy-source-select');
-  const electricitySlider = document.getElementById('electricity-slider');
-  const gasSlider = document.getElementById('gas-slider');
+  document.querySelectorAll('.option-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      card.querySelector('input').checked = true;
+      userData.portfolioOver5k = card.dataset.value;
 
-  energySourceSelect?.addEventListener('change', (e) => {
-    userData.energySource = e.target.value || null;
+      if (card.dataset.value === 'no') {
+        showModal(document.getElementById('spend-threshold-overlay'));
+        card.classList.remove('selected');
+        card.querySelector('input').checked = false;
+        userData.portfolioOver5k = null;
+      }
+
+      updateNextButton();
+    });
   });
 
-  electricitySlider?.addEventListener('input', (e) => {
-    userData.bills.electricity = parseInt(e.target.value);
-    document.getElementById('electricity-value').textContent = `$${userData.bills.electricity.toLocaleString()}`;
-  });
-
-  gasSlider?.addEventListener('input', (e) => {
-    userData.bills.gas = parseInt(e.target.value);
-    document.getElementById('gas-value').textContent = `$${userData.bills.gas.toLocaleString()}`;
-  });
-
-  // This step is always valid
-  nextBtn.disabled = false;
-  nextBtn.textContent = 'Next';
+  updateNextButton();
 }
 
 // STEP 5: Property Details & Additional Information
@@ -779,81 +768,109 @@ function renderPropertyDetailsStep() {
       <h2 class="question-title">Property & Utility Details</h2>
       <p class="question-subtitle">Help us understand your property and current utility setup.</p>
     </div>
-    <div class="form-grid">
-      <div class="form-field">
-        <label class="form-label">Do you own this property?</label>
-        <select class="form-select" id="ownership-select">
-          ${ownershipOptions.map(opt => `
-            <option value="${opt.value}" ${userData.propertyDetails.ownsProperty === opt.value ? 'selected' : ''}>${opt.label}</option>
-          `).join('')}
-        </select>
+
+    <div class="security-notice">
+      <div class="security-notice-icon">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
       </div>
-      <div class="form-field">
-        <label class="form-label">Name of Electric Utility</label>
-        <input type="text" class="form-text-input" id="electric-utility" placeholder="e.g., Pacific Gas and Electric" value="${userData.propertyDetails.electricUtility}">
-      </div>
-      <div class="form-field">
-        <label class="form-label">Retail Energy Provider <span style="color: #64748b; font-weight: 400;">(if different than utility)</span></label>
-        <input type="text" class="form-text-input" id="retail-provider" placeholder="e.g., Direct Energy" value="${userData.propertyDetails.retailProvider}">
+      <div>
+        <strong>Your information is protected.</strong> All documents and data are handled under a strict Non-Disclosure Agreement (NDA). Ideal will never share your proprietary information with third parties without your explicit consent.
       </div>
     </div>
 
-    <div class="additional-details-section">
-      <div class="section-divider">
-        <h3 class="section-header">Additional Details</h3>
-        <p class="section-subtext">These help us better prepare paths for your energy procurement. All fields are optional.</p>
-      </div>
+    <!-- Document Signing Section -->
+    <div class="docusign-section">
+      <h3 class="section-header">Documents to Sign</h3>
+      <p class="section-subtext" style="margin-bottom: 20px;">Please review and sign the following documents to authorize Ideal to act on your behalf.</p>
 
-      <div class="form-grid">
-        <div class="form-field">
-          <label class="form-label">Energy Charges (per kWh)</label>
-          <div class="slider-container">
-            <div class="slider-header">
-              <span></span>
-              <span class="slider-value" id="energy-charges-value">${userData.additionalDetails.energyCharges !== null ? '$' + userData.additionalDetails.energyCharges.toFixed(3) : 'Not set'}</span>
+      <div class="docusign-grid">
+        <div class="docusign-card" id="loa-card">
+          <div class="docusign-card-header">
+            <div class="docusign-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             </div>
-            <input type="range" class="slider-input" id="energy-charges-slider" min="0" max="0.5" step="0.001" value="${userData.additionalDetails.energyCharges || 0.1}">
-            <div class="slider-range">
-              <span>$0.00</span>
-              <span>$0.50</span>
+            <div>
+              <h4 class="docusign-title">Letter of Authorization (LOA)</h4>
+              <p class="docusign-desc">Authorizes Ideal to request energy pricing on your behalf</p>
             </div>
           </div>
-        </div>
-        <div class="form-field">
-          <label class="form-label">Demand Charges (per kW)</label>
-          <div class="slider-container">
-            <div class="slider-header">
-              <span></span>
-              <span class="slider-value" id="demand-charges-value">${userData.additionalDetails.demandCharges !== null ? '$' + userData.additionalDetails.demandCharges.toFixed(2) : 'Not set'}</span>
-            </div>
-            <input type="range" class="slider-input" id="demand-charges-slider" min="0" max="50" step="0.5" value="${userData.additionalDetails.demandCharges || 10}">
-            <div class="slider-range">
-              <span>$0</span>
-              <span>$50</span>
+          <div class="docusign-preview">
+            <div class="docusign-preview-content">
+              <div class="docusign-preview-header">LETTER OF AUTHORIZATION</div>
+              <div class="docusign-preview-line" style="width: 80%"></div>
+              <div class="docusign-preview-line" style="width: 100%"></div>
+              <div class="docusign-preview-line" style="width: 90%"></div>
+              <div class="docusign-preview-line" style="width: 95%"></div>
+              <div class="docusign-preview-line" style="width: 60%"></div>
+              <div class="docusign-preview-spacer"></div>
+              <div class="docusign-preview-line" style="width: 100%"></div>
+              <div class="docusign-preview-line" style="width: 85%"></div>
+              <div class="docusign-preview-line" style="width: 70%"></div>
+              <div class="docusign-preview-spacer"></div>
+              <div class="docusign-signature-area">
+                <div class="docusign-sig-line">
+                  <span class="docusign-sig-label">Signature</span>
+                  <span class="docusign-sig-x">X ___________________________</span>
+                </div>
+                <div class="docusign-sig-line">
+                  <span class="docusign-sig-label">Date</span>
+                  <span class="docusign-sig-x">___________________________</span>
+                </div>
+              </div>
             </div>
           </div>
+          <button class="docusign-btn" id="sign-loa-btn">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            Sign Document
+          </button>
+        </div>
+
+        <div class="docusign-card" id="loe-card">
+          <div class="docusign-card-header">
+            <div class="docusign-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <div>
+              <h4 class="docusign-title">Letter of Enrollment (LOE)</h4>
+              <p class="docusign-desc">Enrolls your account into the Ideal energy auction platform</p>
+            </div>
+          </div>
+          <div class="docusign-preview">
+            <div class="docusign-preview-content">
+              <div class="docusign-preview-header">LETTER OF ENROLLMENT</div>
+              <div class="docusign-preview-line" style="width: 85%"></div>
+              <div class="docusign-preview-line" style="width: 100%"></div>
+              <div class="docusign-preview-line" style="width: 75%"></div>
+              <div class="docusign-preview-line" style="width: 90%"></div>
+              <div class="docusign-preview-line" style="width: 65%"></div>
+              <div class="docusign-preview-spacer"></div>
+              <div class="docusign-preview-line" style="width: 100%"></div>
+              <div class="docusign-preview-line" style="width: 80%"></div>
+              <div class="docusign-preview-line" style="width: 55%"></div>
+              <div class="docusign-preview-spacer"></div>
+              <div class="docusign-signature-area">
+                <div class="docusign-sig-line">
+                  <span class="docusign-sig-label">Signature</span>
+                  <span class="docusign-sig-x">X ___________________________</span>
+                </div>
+                <div class="docusign-sig-line">
+                  <span class="docusign-sig-label">Date</span>
+                  <span class="docusign-sig-x">___________________________</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="docusign-btn" id="sign-loe-btn">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            Sign Document
+          </button>
         </div>
       </div>
 
-      <div class="file-upload-section">
-        <h4 class="file-section-title">Document Uploads</h4>
+      <!-- Document Uploads (right after signing) -->
+      <div class="file-upload-section" style="margin-top: 24px;">
+        <h4 class="file-section-title">Upload Supporting Documents</h4>
         <div class="file-upload-grid">
-          <div class="file-upload-item">
-            <label class="file-upload-label" for="file-loa">
-              <span class="file-icon">📄</span>
-              <span class="file-name" id="file-loa-name">${userData.additionalDetails.files.loa?.name || 'Letter of Authorization (LOA)'}</span>
-              <span class="file-status ${userData.additionalDetails.files.loa ? 'uploaded' : ''}">${userData.additionalDetails.files.loa ? '✓' : 'Upload'}</span>
-            </label>
-            <input type="file" id="file-loa" class="file-input" accept=".pdf,.doc,.docx,.jpg,.png">
-          </div>
-          <div class="file-upload-item">
-            <label class="file-upload-label" for="file-loe">
-              <span class="file-icon">📄</span>
-              <span class="file-name" id="file-loe-name">${userData.additionalDetails.files.loe?.name || 'Letter of Enrollment (LOE)'}</span>
-              <span class="file-status ${userData.additionalDetails.files.loe ? 'uploaded' : ''}">${userData.additionalDetails.files.loe ? '✓' : 'Upload'}</span>
-            </label>
-            <input type="file" id="file-loe" class="file-input" accept=".pdf,.doc,.docx,.jpg,.png">
-          </div>
           <div class="file-upload-item">
             <label class="file-upload-label" for="file-energy-bill">
               <span class="file-icon">📄</span>
@@ -873,14 +890,66 @@ function renderPropertyDetailsStep() {
         </div>
       </div>
     </div>
+
+    <!-- Additional Details Section -->
+    <div class="additional-details-section">
+      <div class="section-divider">
+        <h3 class="section-header">Additional Details</h3>
+        <p class="section-subtext">These are optional — fill out what you can to the best of your ability.</p>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label class="form-label">Do you own this property?</label>
+          <select class="form-select" id="ownership-select">
+            ${ownershipOptions.map(opt => `
+              <option value="${opt.value}" ${userData.propertyDetails.ownsProperty === opt.value ? 'selected' : ''}>${opt.label}</option>
+            `).join('')}
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Are you in a retail energy contract?</label>
+          <div class="toggle-group" id="retail-contract-toggle">
+            <button class="toggle-btn ${userData.additionalDetails.hasRetailContract === 'yes' ? 'active' : ''}" data-value="yes">Yes</button>
+            <button class="toggle-btn ${userData.additionalDetails.hasRetailContract === 'no' ? 'active' : ''}" data-value="no">No</button>
+          </div>
+        </div>
+        <div class="form-field" id="retail-provider-field" style="display: ${userData.additionalDetails.hasRetailContract === 'yes' ? 'block' : 'none'};">
+          <label class="form-label">Retail Energy Provider</label>
+          <input type="text" class="form-text-input" id="retail-provider" placeholder="e.g., Direct Energy" value="${userData.additionalDetails.retailProvider}">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Name of Electric Utility</label>
+          <input type="text" class="form-text-input" id="electric-utility" placeholder="e.g., Pacific Gas and Electric" value="${userData.propertyDetails.electricUtility}">
+        </div>
+      </div>
+
+      <div class="form-field" style="margin-top: 24px;">
+        <label class="form-label">Additional Notes</label>
+        <textarea class="form-textarea" id="additional-notes" rows="4" placeholder="Anything else you'd like us to know about your energy setup, contract timing, or specific needs...">${userData.additionalDetails.notes || ''}</textarea>
+      </div>
+    </div>
   `;
 
-  // Add event handlers
+  // Document signing button handlers
+  document.getElementById('sign-loa-btn')?.addEventListener('click', () => {
+    if (signedDocuments.loa?.signed) return;
+    openSigningModal('loa');
+  });
+  document.getElementById('sign-loe-btn')?.addEventListener('click', () => {
+    if (signedDocuments.loe?.signed) return;
+    openSigningModal('loe');
+  });
+
+  // Restore signed state if returning to this step
+  if (signedDocuments.loa?.signed) updateDocCardUI('loa');
+  if (signedDocuments.loe?.signed) updateDocCardUI('loe');
+
+  // Additional details event handlers
   const ownershipSelect = document.getElementById('ownership-select');
   const electricUtilityInput = document.getElementById('electric-utility');
   const retailProviderInput = document.getElementById('retail-provider');
-  const energyChargesSlider = document.getElementById('energy-charges-slider');
-  const demandChargesSlider = document.getElementById('demand-charges-slider');
+  const additionalNotesInput = document.getElementById('additional-notes');
 
   ownershipSelect?.addEventListener('change', (e) => {
     userData.propertyDetails.ownsProperty = e.target.value || null;
@@ -891,29 +960,32 @@ function renderPropertyDetailsStep() {
   });
 
   retailProviderInput?.addEventListener('input', (e) => {
-    userData.propertyDetails.retailProvider = e.target.value;
+    userData.additionalDetails.retailProvider = e.target.value;
   });
 
-  // Track if sliders have been interacted with
-  let energyChargesInteracted = userData.additionalDetails.energyCharges !== null;
-  let demandChargesInteracted = userData.additionalDetails.demandCharges !== null;
-
-  energyChargesSlider?.addEventListener('input', (e) => {
-    energyChargesInteracted = true;
-    userData.additionalDetails.energyCharges = parseFloat(e.target.value);
-    document.getElementById('energy-charges-value').textContent = `$${userData.additionalDetails.energyCharges.toFixed(3)}`;
+  additionalNotesInput?.addEventListener('input', (e) => {
+    userData.additionalDetails.notes = e.target.value;
   });
 
-  demandChargesSlider?.addEventListener('input', (e) => {
-    demandChargesInteracted = true;
-    userData.additionalDetails.demandCharges = parseFloat(e.target.value);
-    document.getElementById('demand-charges-value').textContent = `$${userData.additionalDetails.demandCharges.toFixed(2)}`;
+  // Retail contract toggle
+  document.querySelectorAll('#retail-contract-toggle .toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#retail-contract-toggle .toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      userData.additionalDetails.hasRetailContract = btn.dataset.value;
+      const providerField = document.getElementById('retail-provider-field');
+      if (btn.dataset.value === 'yes') {
+        providerField.style.display = 'block';
+      } else {
+        providerField.style.display = 'none';
+        userData.additionalDetails.retailProvider = '';
+        if (retailProviderInput) retailProviderInput.value = '';
+      }
+    });
   });
 
   // File upload handlers
   const fileInputs = [
-    { id: 'file-loa', key: 'loa', nameId: 'file-loa-name' },
-    { id: 'file-loe', key: 'loe', nameId: 'file-loe-name' },
     { id: 'file-energy-bill', key: 'energyBill', nameId: 'file-energy-bill-name' },
     { id: 'file-energy-contract', key: 'energyContract', nameId: 'file-energy-contract-name' }
   ];
@@ -1000,7 +1072,7 @@ function updateNextButton() {
       nextBtn.textContent = 'Next';
       break;
     case STEPS.ENERGY_BILLS:
-      nextBtn.disabled = false;
+      nextBtn.disabled = !userData.portfolioOver5k;
       nextBtn.textContent = 'Next';
       break;
     case STEPS.CONTACT:
@@ -1059,6 +1131,7 @@ function handleStartOver() {
   landingPage.style.display = 'block';
   appContainer.style.display = 'none';
   currentStep = 0;
+  signedDocuments = { loa: null, loe: null };
   userData = {
     location: null,
     auctionType: null,
@@ -1089,8 +1162,8 @@ async function handleSubmit() {
   showLoading('Submitting your information...');
 
   try {
-    // Submit to Firebase
-    const result = await submitLeadToFirebase(userData);
+    // Submit to Firebase (include signed documents)
+    const result = await submitLeadToFirebase(userData, signedDocuments);
 
     hideLoading();
 
@@ -1122,27 +1195,17 @@ async function handleSubmit() {
   }
 }
 
-function downloadProfile() {
+async function downloadProfile() {
+  const { PDFDocument, rgb, StandardFonts } = PDFLib;
   const eligibility = checkIdealEligibility(userData.location?.state);
-  const auctionTypes = getAvailableAuctionTypes(userData.location?.state);
 
   const auctionTypeText = userData.auctionType === 'both' ? 'Electricity & Natural Gas' :
                           userData.auctionType === 'electricity' ? 'Electricity Only' : 'Natural Gas Only';
 
   const propertyTypeText = {
     commercial: 'Commercial',
-    industrial: 'Industrial',
-    multifamily: 'Multi-Family'
+    residential: 'Residential'
   }[userData.propertyType] || userData.propertyType;
-
-  const energySourceText = {
-    grid_electricity: 'Grid Electricity',
-    solar: 'Solar',
-    natural_gas: 'Natural Gas',
-    propane: 'Propane',
-    oil: 'Oil',
-    mixed: 'Mixed Sources'
-  }[userData.energySource] || null;
 
   const ownershipText = {
     own: 'Yes, owns property',
@@ -1150,130 +1213,727 @@ function downloadProfile() {
     manage: 'Manages property for owner'
   }[userData.propertyDetails?.ownsProperty] || null;
 
-  // Build property details section conditionally
-  let propertyDetailsSection = '';
-  if (ownershipText || userData.propertyDetails?.electricUtility || userData.propertyDetails?.retailProvider) {
-    propertyDetailsSection = `
--------------------------------------------
-PROPERTY DETAILS
--------------------------------------------`;
-    if (ownershipText) {
-      propertyDetailsSection += `\nOwnership: ${ownershipText}`;
-    }
-    if (userData.propertyDetails?.electricUtility) {
-      propertyDetailsSection += `\nElectric Utility: ${userData.propertyDetails.electricUtility}`;
-    }
-    if (userData.propertyDetails?.retailProvider) {
-      propertyDetailsSection += `\nRetail Energy Provider: ${userData.propertyDetails.retailProvider}`;
-    }
-    propertyDetailsSection += '\n';
-  }
+  showLoading('Generating PDF...');
 
-  // Build additional details section conditionally
-  let additionalDetailsSection = '';
-  const hasAdditionalDetails = userData.additionalDetails?.energyCharges !== null ||
-                                userData.additionalDetails?.demandCharges !== null ||
-                                userData.additionalDetails?.files?.loa ||
-                                userData.additionalDetails?.files?.loe ||
-                                userData.additionalDetails?.files?.energyBill ||
-                                userData.additionalDetails?.files?.energyContract;
+  try {
+    const pdfDoc = await PDFDocument.create();
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-  if (hasAdditionalDetails) {
-    additionalDetailsSection = `
--------------------------------------------
-ADDITIONAL DETAILS
--------------------------------------------`;
-    if (userData.additionalDetails?.energyCharges !== null) {
-      additionalDetailsSection += `\nEnergy Charges: $${userData.additionalDetails.energyCharges.toFixed(3)}/kWh`;
-    }
-    if (userData.additionalDetails?.demandCharges !== null) {
-      additionalDetailsSection += `\nDemand Charges: $${userData.additionalDetails.demandCharges.toFixed(2)}/kW`;
+    const pageWidth = 612;
+    const pageHeight = 792;
+    const margin = 50;
+    const contentWidth = pageWidth - margin * 2;
+
+    // Colors
+    const brandDark = rgb(0.118, 0.227, 0.373);    // #1e3a5f
+    const brandAccent = rgb(0.192, 0.463, 0.710);   // #3176b5
+    const textDark = rgb(0.18, 0.20, 0.25);
+    const textMedium = rgb(0.38, 0.40, 0.45);
+    const lineColor = rgb(0.82, 0.84, 0.86);
+    const bgLight = rgb(0.95, 0.96, 0.97);
+
+    // Helper: draw text that wraps and returns new Y position
+    function drawWrappedText(page, text, x, y, maxWidth, size, usedFont, color) {
+      const words = text.split(/\s+/);
+      let currentLine = '';
+      let currentY = y;
+      for (const word of words) {
+        const testLine = currentLine ? `${currentLine} ${word}` : word;
+        if (usedFont.widthOfTextAtSize(testLine, size) > maxWidth && currentLine) {
+          page.drawText(currentLine, { x, y: currentY, size, font: usedFont, color });
+          currentY -= size + 4;
+          currentLine = word;
+        } else {
+          currentLine = testLine;
+        }
+      }
+      if (currentLine) {
+        page.drawText(currentLine, { x, y: currentY, size, font: usedFont, color });
+        currentY -= size + 4;
+      }
+      return currentY;
     }
 
-    // List uploaded documents
+    // Helper: draw a section header with accent bar
+    function drawSectionHeader(page, title, y) {
+      page.drawRectangle({
+        x: margin,
+        y: y - 2,
+        width: 3,
+        height: 16,
+        color: brandAccent
+      });
+      page.drawText(title.toUpperCase(), {
+        x: margin + 12,
+        y: y,
+        size: 10,
+        font: fontBold,
+        color: brandDark
+      });
+      return y - 24;
+    }
+
+    // Helper: draw a label-value row
+    function drawRow(page, label, value, y) {
+      if (!value) return y;
+      page.drawText(label, { x: margin + 12, y, size: 9, font: fontBold, color: textMedium });
+      page.drawText(String(value), { x: margin + 160, y, size: 9, font: font, color: textDark });
+      return y - 16;
+    }
+
+    // Helper: check if we need a new page
+    function ensureSpace(page, y, needed) {
+      if (y - needed < margin) {
+        const newPage = pdfDoc.addPage([pageWidth, pageHeight]);
+        return { page: newPage, y: pageHeight - margin };
+      }
+      return { page, y };
+    }
+
+    // ===== PAGE 1: LEAD PROFILE =====
+    let page = pdfDoc.addPage([pageWidth, pageHeight]);
+    let y = pageHeight - margin;
+
+    // Header background
+    page.drawRectangle({
+      x: 0, y: pageHeight - 100,
+      width: pageWidth, height: 100,
+      color: brandDark
+    });
+
+    // Title
+    const title = 'IDEAL ENERGY SOLUTIONS';
+    const titleWidth = fontBold.widthOfTextAtSize(title, 18);
+    page.drawText(title, {
+      x: (pageWidth - titleWidth) / 2,
+      y: pageHeight - 48,
+      size: 18,
+      font: fontBold,
+      color: rgb(1, 1, 1)
+    });
+
+    // Subtitle
+    const subtitle = 'Lead Profile Report';
+    const subWidth = font.widthOfTextAtSize(subtitle, 11);
+    page.drawText(subtitle, {
+      x: (pageWidth - subWidth) / 2,
+      y: pageHeight - 68,
+      size: 11,
+      font: font,
+      color: rgb(0.75, 0.82, 0.92)
+    });
+
+    // Date and ID line
+    const dateLine = `Submitted: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+    const dateWidth = font.widthOfTextAtSize(dateLine, 8);
+    page.drawText(dateLine, {
+      x: (pageWidth - dateWidth) / 2,
+      y: pageHeight - 86,
+      size: 8,
+      font: font,
+      color: rgb(0.6, 0.7, 0.82)
+    });
+
+    y = pageHeight - 120;
+
+    // --- Contact Information ---
+    y = drawSectionHeader(page, 'Contact Information', y);
+    y = drawRow(page, 'Name:', userData.contact.name, y);
+    y = drawRow(page, 'Email:', userData.contact.email, y);
+    y = drawRow(page, 'Phone:', userData.contact.phone || 'Not provided', y);
+    y -= 10;
+
+    // Divider
+    page.drawLine({ start: { x: margin, y }, end: { x: pageWidth - margin, y }, thickness: 0.5, color: lineColor });
+    y -= 18;
+
+    // --- Location ---
+    y = drawSectionHeader(page, 'Location', y);
+    y = drawRow(page, 'Address:', userData.location?.address || 'N/A', y);
+    y = drawRow(page, 'State:', `${eligibility.stateName} (${userData.location?.state})`, y);
+    if (userData.location?.lat && userData.location?.lng) {
+      y = drawRow(page, 'Coordinates:', `${userData.location.lat.toFixed(6)}, ${userData.location.lng.toFixed(6)}`, y);
+    }
+    y -= 10;
+
+    page.drawLine({ start: { x: margin, y }, end: { x: pageWidth - margin, y }, thickness: 0.5, color: lineColor });
+    y -= 18;
+
+    // --- Market Status ---
+    y = drawSectionHeader(page, 'Market Status', y);
+    const deregText = eligibility.status === 'full' ? 'Full Access' : eligibility.status === 'limited' ? 'Limited Access' : 'Partial';
+    const elecText = eligibility.electricityStatus === 'full' ? 'Yes' : eligibility.electricityStatus === 'partial' ? 'Limited' : 'No';
+    const gasText = eligibility.gasStatus === 'full' ? 'Yes' : eligibility.gasStatus === 'partial' ? 'Limited' : 'No';
+    y = drawRow(page, 'Deregulation:', deregText, y);
+    y = drawRow(page, 'Electricity:', elecText, y);
+    y = drawRow(page, 'Gas:', gasText, y);
+    if (eligibility.scope) y = drawRow(page, 'Scope:', eligibility.scope, y);
+    y -= 10;
+
+    page.drawLine({ start: { x: margin, y }, end: { x: pageWidth - margin, y }, thickness: 0.5, color: lineColor });
+    y -= 18;
+
+    // --- Service Request ---
+    y = drawSectionHeader(page, 'Service Request', y);
+    y = drawRow(page, 'Auction Type:', auctionTypeText, y);
+    y = drawRow(page, 'Property Type:', propertyTypeText, y);
+    y = drawRow(page, 'Portfolio > $5k/mo:', userData.portfolioOver5k === 'yes' ? 'Yes' : 'No', y);
+    y -= 10;
+
+    page.drawLine({ start: { x: margin, y }, end: { x: pageWidth - margin, y }, thickness: 0.5, color: lineColor });
+    y -= 18;
+
+    // --- Property Details (if any) ---
+    if (ownershipText || userData.propertyDetails?.electricUtility || userData.additionalDetails?.hasRetailContract) {
+      ({ page, y } = ensureSpace(page, y, 100));
+      y = drawSectionHeader(page, 'Property Details', y);
+      if (ownershipText) y = drawRow(page, 'Ownership:', ownershipText, y);
+      if (userData.propertyDetails?.electricUtility) y = drawRow(page, 'Electric Utility:', userData.propertyDetails.electricUtility, y);
+      if (userData.additionalDetails?.hasRetailContract) {
+        y = drawRow(page, 'Retail Contract:', userData.additionalDetails.hasRetailContract === 'yes' ? 'Yes' : 'No', y);
+      }
+      if (userData.additionalDetails?.retailProvider) y = drawRow(page, 'Retail Provider:', userData.additionalDetails.retailProvider, y);
+      y -= 10;
+
+      page.drawLine({ start: { x: margin, y }, end: { x: pageWidth - margin, y }, thickness: 0.5, color: lineColor });
+      y -= 18;
+    }
+
+    // --- Additional Notes (if any) ---
+    if (userData.additionalDetails?.notes) {
+      ({ page, y } = ensureSpace(page, y, 80));
+      y = drawSectionHeader(page, 'Additional Notes', y);
+      y = drawWrappedText(page, userData.additionalDetails.notes, margin + 12, y, contentWidth - 12, 9, font, textDark);
+      y -= 10;
+
+      page.drawLine({ start: { x: margin, y }, end: { x: pageWidth - margin, y }, thickness: 0.5, color: lineColor });
+      y -= 18;
+    }
+
+    // --- Uploaded Documents ---
     const uploadedFiles = [];
-    if (userData.additionalDetails?.files?.loa) uploadedFiles.push(`LOA: ${userData.additionalDetails.files.loa.name}`);
-    if (userData.additionalDetails?.files?.loe) uploadedFiles.push(`LOE: ${userData.additionalDetails.files.loe.name}`);
     if (userData.additionalDetails?.files?.energyBill) uploadedFiles.push(`Energy Bill: ${userData.additionalDetails.files.energyBill.name}`);
     if (userData.additionalDetails?.files?.energyContract) uploadedFiles.push(`Energy Contract: ${userData.additionalDetails.files.energyContract.name}`);
+    if (signedDocuments.loa?.signed) uploadedFiles.push('LOA: Signed');
+    if (signedDocuments.loe?.signed) uploadedFiles.push('LOE: Signed');
 
     if (uploadedFiles.length > 0) {
-      additionalDetailsSection += `\n\nDocuments Uploaded:\n${uploadedFiles.map(f => `  - ${f}`).join('\n')}`;
+      ({ page, y } = ensureSpace(page, y, 60));
+      y = drawSectionHeader(page, 'Documents', y);
+      for (const f of uploadedFiles) {
+        page.drawText(`•  ${f}`, { x: margin + 12, y, size: 9, font, color: textDark });
+        y -= 16;
+      }
+      y -= 10;
     }
-    additionalDetailsSection += '\n';
+
+    // --- Next Steps ---
+    ({ page, y } = ensureSpace(page, y, 120));
+    y -= 6;
+    // Light background box for next steps
+    page.drawRectangle({
+      x: margin, y: y - 92,
+      width: contentWidth, height: 106,
+      color: bgLight,
+      borderColor: lineColor,
+      borderWidth: 0.5
+    });
+    y -= 4;
+    y = drawSectionHeader(page, 'Next Steps', y);
+    const steps = [
+      'Verify contact information',
+      'Confirm service address and utility accounts',
+      'Review authorization documents (LOA/LOE)',
+      'Obtain recent utility bills for rate analysis',
+      'Begin provider outreach and auction process'
+    ];
+    steps.forEach((step, i) => {
+      page.drawText(`${i + 1}.`, { x: margin + 12, y, size: 9, font: fontBold, color: brandAccent });
+      page.drawText(step, { x: margin + 28, y, size: 9, font, color: textDark });
+      y -= 15;
+    });
+
+    // Footer
+    const footer = 'Generated via Ideal Energy Solutions  •  idealenergyforms@gmail.com';
+    const footerWidth = font.widthOfTextAtSize(footer, 7);
+    page.drawText(footer, {
+      x: (pageWidth - footerWidth) / 2,
+      y: margin - 25,
+      size: 7,
+      font,
+      color: textMedium
+    });
+
+    // ===== APPEND SIGNED DOCUMENTS =====
+    // Copy signed LOA pages into this PDF
+    if (signedDocuments.loa?.pdfBytes) {
+      const loaPdf = await PDFDocument.load(signedDocuments.loa.pdfBytes);
+      const loaPages = await pdfDoc.copyPages(loaPdf, loaPdf.getPageIndices());
+      for (const p of loaPages) pdfDoc.addPage(p);
+    }
+
+    // Copy signed LOE pages into this PDF
+    if (signedDocuments.loe?.pdfBytes) {
+      const loePdf = await PDFDocument.load(signedDocuments.loe.pdfBytes);
+      const loePages = await pdfDoc.copyPages(loePdf, loePdf.getPageIndices());
+      for (const p of loePages) pdfDoc.addPage(p);
+    }
+
+    // Save and download
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Ideal_Lead_${userData.contact.name.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    hideLoading();
+    showToast('Lead profile PDF downloaded!', 'success');
+  } catch (error) {
+    hideLoading();
+    console.error('Error generating profile PDF:', error);
+    showToast('Error generating PDF. Please try again.', 'error');
+  }
+}
+
+// ==========================================
+// DOCUMENT SIGNING
+// ==========================================
+
+const DOCUMENT_CONTENT = {
+  loa: {
+    title: 'Letter of Authorization',
+    html: `
+      <h4>Letter of Authorization</h4>
+      <p class="doc-subtitle">Ideal Energy Solutions</p>
+      <p>This Letter of Authorization ("LOA") is entered into as of the date signed below, by the undersigned customer ("Customer") in favor of Ideal Energy Solutions ("IES" or "Agent").</p>
+      <p class="doc-section-title">1. Authorization</p>
+      <p>Customer hereby authorizes IES to act as its authorized agent for the sole purpose of soliciting competitive energy supply pricing from retail energy providers on Customer's behalf. This authorization includes, but is not limited to:</p>
+      <ol>
+        <li>Requesting energy supply pricing and proposals from licensed retail energy providers;</li>
+        <li>Obtaining Customer's historical energy usage data from the local utility or distribution company;</li>
+        <li>Submitting Customer's load data to retail energy providers for the purpose of receiving competitive bids;</li>
+        <li>Facilitating communication between Customer and prospective energy suppliers.</li>
+      </ol>
+      <p class="doc-section-title">2. Scope of Authority</p>
+      <p>This LOA does not authorize IES to enter into any binding energy supply agreement on behalf of Customer. All final purchasing decisions and contract executions remain solely at Customer's discretion. IES will present all qualified bids to Customer for review and approval.</p>
+      <p class="doc-section-title">3. Confidentiality</p>
+      <p>IES agrees to treat all Customer information obtained pursuant to this authorization as confidential and shall not disclose such information to any party other than prospective energy suppliers for the express purpose of obtaining competitive pricing.</p>
+      <p class="doc-section-title">4. Term</p>
+      <p>This authorization shall remain in effect for a period of twelve (12) months from the date of execution, unless terminated earlier by written notice from Customer. Customer may revoke this authorization at any time by providing written notice to IES.</p>
+      <p class="doc-section-title">5. No Cost to Customer</p>
+      <p>Customer acknowledges that IES provides its energy procurement and consulting services at no direct cost to Customer. IES is compensated through supplier commissions, which are disclosed transparently to Customer upon request.</p>
+    `
+  },
+  loe: {
+    title: 'Letter of Enrollment',
+    html: `
+      <h4>Letter of Enrollment</h4>
+      <p class="doc-subtitle">Ideal Energy Solutions</p>
+      <p>This Letter of Enrollment ("LOE") is entered into as of the date signed below, by the undersigned customer ("Customer") to formally enroll in the Ideal Energy Solutions ("IES") energy procurement platform.</p>
+      <p class="doc-section-title">1. Enrollment</p>
+      <p>By signing this document, Customer agrees to participate in the IES energy auction platform and acknowledges the following:</p>
+      <ol>
+        <li>Customer's energy account(s) will be registered on the IES procurement platform for the purpose of conducting competitive energy auctions;</li>
+        <li>IES will coordinate with Customer's local utility to obtain necessary account information and usage history;</li>
+        <li>Customer's energy load profile will be presented to pre-vetted, licensed retail energy providers through IES's reverse auction process;</li>
+        <li>Customer will receive all competitive bids and retains full decision-making authority over any contract execution.</li>
+      </ol>
+      <p class="doc-section-title">2. Auction Process</p>
+      <p>IES will conduct a reverse auction among qualified energy suppliers on Customer's behalf. The auction process is designed to maximize competition and transparency, ensuring Customer receives the lowest available market rate. Customer is under no obligation to accept any bid received through the auction.</p>
+      <p class="doc-section-title">3. Account Information</p>
+      <p>Customer agrees to provide accurate account information, including but not limited to: utility account numbers, service addresses, current contract details (if applicable), and historical usage data. This information is required to facilitate accurate pricing from energy suppliers.</p>
+      <p class="doc-section-title">4. Data Protection</p>
+      <p>IES maintains strict data protection protocols. All Customer information is stored securely and shared only with vetted energy suppliers participating in Customer's specific auction. IES complies with all applicable data privacy regulations.</p>
+      <p class="doc-section-title">5. Term and Cancellation</p>
+      <p>This enrollment remains active for the duration of Customer's energy contract procured through IES, or twelve (12) months from enrollment date, whichever is longer. Customer may cancel enrollment at any time prior to executing an energy supply agreement by providing written notice to IES.</p>
+    `
+  }
+};
+
+// Track signed documents
+let signedDocuments = { loa: null, loe: null };
+let activeSigningDoc = null;
+let signaturePad = null;
+
+function openSigningModal(docType) {
+  const doc = DOCUMENT_CONTENT[docType];
+  if (!doc) return;
+
+  activeSigningDoc = docType;
+
+  // Set title and content
+  document.getElementById('signing-modal-title').textContent = `Sign: ${doc.title}`;
+  document.getElementById('signing-document-content').innerHTML = doc.html;
+
+  // Pre-fill name from contact info if available
+  const nameInput = document.getElementById('signing-name');
+  if (userData.contact.name && nameInput) {
+    nameInput.value = userData.contact.name;
   }
 
-  // Create email body content
-  const emailBody = `
-===========================================
-IDEAL ENERGY - NEW LEAD PROFILE
-===========================================
+  // Set today's date
+  const dateInput = document.getElementById('signing-date');
+  if (dateInput) {
+    dateInput.value = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
 
-SUBMISSION DATE: ${new Date().toLocaleString()}
-LEAD ID: ${Date.now()}
+  // Show the modal
+  showModal(document.getElementById('signing-overlay'));
 
--------------------------------------------
-CONTACT INFORMATION
--------------------------------------------
-Name: ${userData.contact.name}
-Email: ${userData.contact.email}
-Phone: ${userData.contact.phone || 'Not provided'}
+  // Initialize signature pad after modal is visible
+  setTimeout(() => {
+    initSignaturePad();
+    updateSigningSubmitButton();
+  }, 100);
+}
 
--------------------------------------------
-LOCATION
--------------------------------------------
-Address: ${userData.location?.address || 'N/A'}
-State: ${eligibility.stateName} (${userData.location?.state})
-Coordinates: ${userData.location?.lat?.toFixed(6)}, ${userData.location?.lng?.toFixed(6)}
+function initSignaturePad() {
+  const canvas = document.getElementById('signature-canvas');
+  if (!canvas) return;
 
--------------------------------------------
-MARKET STATUS
--------------------------------------------
-Deregulation Status: ${eligibility.status === 'full' ? 'Full Access' : eligibility.status === 'limited' ? 'Limited Access' : 'Partial'}
-Electricity Choice: ${eligibility.electricityStatus === 'full' ? 'Yes' : eligibility.electricityStatus === 'partial' ? 'Limited' : 'No'}
-Gas Choice: ${eligibility.gasStatus === 'full' ? 'Yes' : eligibility.gasStatus === 'partial' ? 'Limited' : 'No'}
-${eligibility.scope ? `Scope: ${eligibility.scope}` : ''}
+  // Size canvas to container
+  const container = canvas.parentElement;
+  const ratio = Math.max(window.devicePixelRatio || 1, 1);
+  canvas.width = container.offsetWidth * ratio;
+  canvas.height = container.offsetHeight * ratio;
+  canvas.getContext('2d').scale(ratio, ratio);
 
--------------------------------------------
-SERVICE REQUEST
--------------------------------------------
-Auction Type: ${auctionTypeText}
-Property Type: ${propertyTypeText}
+  signaturePad = new SignaturePad(canvas, {
+    backgroundColor: 'rgb(255, 255, 255)',
+    penColor: '#1e3a5f',
+    minWidth: 1.5,
+    maxWidth: 3
+  });
 
--------------------------------------------
-ENERGY PROFILE
--------------------------------------------
-${energySourceText ? `Primary Energy Source: ${energySourceText}` : ''}
-${userData.auctionType === 'electricity' || userData.auctionType === 'both' ? `Est. Monthly Electricity: $${userData.bills.electricity.toLocaleString()}` : ''}
-${userData.auctionType === 'gas' || userData.auctionType === 'both' ? `Est. Monthly Gas: $${userData.bills.gas.toLocaleString()}` : ''}
-${userData.auctionType === 'both' ? `Combined Monthly: $${(userData.bills.electricity + userData.bills.gas).toLocaleString()}` : ''}
-${propertyDetailsSection}${additionalDetailsSection}
--------------------------------------------
-NEXT STEPS
--------------------------------------------
-1. Verify contact information
-2. Confirm service address and utility accounts
-3. Request authorization documents (LOA/LOE)
-4. Obtain recent utility bills for rate analysis
-5. Begin provider outreach and auction process
+  signaturePad.addEventListener('endStroke', updateSigningSubmitButton);
 
-===========================================
-This lead was generated via the Ideal website.
-===========================================
-`.trim();
+  // Clear button
+  document.getElementById('signature-clear')?.addEventListener('click', () => {
+    signaturePad.clear();
+    updateSigningSubmitButton();
+  });
+}
 
-  // Create and download file
-  const blob = new Blob([emailBody], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `ideal_lead_${userData.contact.name.replace(/\s+/g, '_')}_${Date.now()}.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+function updateSigningSubmitButton() {
+  const submitBtn = document.getElementById('signing-submit');
+  const nameInput = document.getElementById('signing-name');
+  if (!submitBtn) return;
 
-  showToast('Lead profile downloaded!', 'success');
+  const hasName = nameInput?.value.trim().length > 0;
+  const hasSig = signaturePad && !signaturePad.isEmpty();
+  submitBtn.disabled = !(hasName && hasSig);
+}
+
+async function handleSigningSubmit() {
+  if (!signaturePad || signaturePad.isEmpty() || !activeSigningDoc) return;
+
+  const signerName = document.getElementById('signing-name')?.value.trim();
+  const signerTitle = document.getElementById('signing-title')?.value.trim();
+  const signDate = document.getElementById('signing-date')?.value;
+  const signatureDataUrl = signaturePad.toDataURL('image/png');
+
+  showLoading('Generating signed document...');
+
+  try {
+    // Generate signed PDF
+    const pdfBytes = await generateSignedPDF(activeSigningDoc, signerName, signerTitle, signDate, signatureDataUrl);
+
+    // Store the signed document
+    signedDocuments[activeSigningDoc] = {
+      signed: true,
+      signerName,
+      signerTitle,
+      signDate,
+      pdfBytes,
+      signatureDataUrl
+    };
+
+    hideLoading();
+    hideModal(document.getElementById('signing-overlay'));
+
+    // Update the card UI
+    updateDocCardUI(activeSigningDoc);
+
+    showToast(`${DOCUMENT_CONTENT[activeSigningDoc].title} signed successfully!`, 'success');
+    activeSigningDoc = null;
+  } catch (error) {
+    hideLoading();
+    console.error('Error generating signed PDF:', error);
+    showToast('Error generating document. Please try again.', 'error');
+  }
+}
+
+async function generateSignedPDF(docType, signerName, signerTitle, signDate, signatureDataUrl) {
+  const { PDFDocument, rgb, StandardFonts } = PDFLib;
+  const doc = DOCUMENT_CONTENT[docType];
+
+  const pdfDoc = await PDFDocument.create();
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  // Strip HTML tags for PDF text
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = doc.html;
+  const plainText = tempDiv.textContent || tempDiv.innerText;
+
+  // Split text into lines that fit the page
+  const pageWidth = 612;
+  const pageHeight = 792;
+  const margin = 60;
+  const contentWidth = pageWidth - margin * 2;
+  const fontSize = 10;
+  const lineHeight = 16;
+  const titleFontSize = 16;
+
+  // Word-wrap the text
+  const words = plainText.split(/\s+/);
+  const lines = [];
+  let currentLine = '';
+
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const testWidth = font.widthOfTextAtSize(testLine, fontSize);
+    if (testWidth > contentWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+
+  // Calculate pages needed (reserve space for signature on last page)
+  const linesPerPage = Math.floor((pageHeight - margin * 2 - 40) / lineHeight);
+  const signatureBlockHeight = 120;
+  const linesOnLastPage = Math.floor((pageHeight - margin * 2 - signatureBlockHeight) / lineHeight);
+
+  // Determine page breaks
+  let remainingLines = [...lines];
+  const pages = [];
+  let isFirstPage = true;
+
+  while (remainingLines.length > 0) {
+    const headerOffset = isFirstPage ? 50 : 0;
+    const availableLines = pages.length === 0 ? linesPerPage - 3 : linesPerPage;
+
+    // Check if remaining lines fit on one more page with signature
+    if (remainingLines.length <= linesOnLastPage) {
+      pages.push({ lines: remainingLines, isFirst: isFirstPage, isLast: true });
+      remainingLines = [];
+    } else {
+      const pageLines = remainingLines.splice(0, availableLines);
+      pages.push({ lines: pageLines, isFirst: isFirstPage, isLast: false });
+    }
+    isFirstPage = false;
+  }
+
+  // If no pages yet (empty doc), create one
+  if (pages.length === 0) {
+    pages.push({ lines: [], isFirst: true, isLast: true });
+  }
+
+  // Mark last page
+  pages[pages.length - 1].isLast = true;
+
+  // Render pages
+  for (const pageData of pages) {
+    const page = pdfDoc.addPage([pageWidth, pageHeight]);
+    let yPos = pageHeight - margin;
+
+    if (pageData.isFirst) {
+      // Title
+      const titleText = doc.title.toUpperCase();
+      const titleWidth = fontBold.widthOfTextAtSize(titleText, titleFontSize);
+      page.drawText(titleText, {
+        x: (pageWidth - titleWidth) / 2,
+        y: yPos,
+        size: titleFontSize,
+        font: fontBold,
+        color: rgb(0.118, 0.231, 0.373)
+      });
+      yPos -= 20;
+
+      const subtitle = 'Ideal Energy Solutions';
+      const subWidth = font.widthOfTextAtSize(subtitle, 10);
+      page.drawText(subtitle, {
+        x: (pageWidth - subWidth) / 2,
+        y: yPos,
+        size: 10,
+        font: font,
+        color: rgb(0.42, 0.45, 0.5)
+      });
+      yPos -= 30;
+
+      // Divider line
+      page.drawLine({
+        start: { x: margin, y: yPos },
+        end: { x: pageWidth - margin, y: yPos },
+        thickness: 0.5,
+        color: rgb(0.85, 0.85, 0.85)
+      });
+      yPos -= 20;
+    }
+
+    // Draw text lines
+    for (const line of pageData.lines) {
+      if (yPos < margin + 20) break;
+      page.drawText(line, {
+        x: margin,
+        y: yPos,
+        size: fontSize,
+        font: font,
+        color: rgb(0.22, 0.25, 0.32)
+      });
+      yPos -= lineHeight;
+    }
+
+    // Signature block on last page
+    if (pageData.isLast) {
+      yPos = Math.min(yPos - 30, margin + signatureBlockHeight + 20);
+
+      // Divider
+      page.drawLine({
+        start: { x: margin, y: yPos + 10 },
+        end: { x: pageWidth - margin, y: yPos + 10 },
+        thickness: 0.5,
+        color: rgb(0.85, 0.85, 0.85)
+      });
+
+      // Embed signature image
+      const sigImage = await pdfDoc.embedPng(signatureDataUrl);
+      const sigDims = sigImage.scale(0.4);
+      const sigWidth = Math.min(sigDims.width, 200);
+      const sigHeight = Math.min(sigDims.height, 50);
+
+      page.drawImage(sigImage, {
+        x: margin,
+        y: yPos - sigHeight - 5,
+        width: sigWidth,
+        height: sigHeight
+      });
+
+      // Signature line
+      const sigLineY = yPos - sigHeight - 10;
+      page.drawLine({
+        start: { x: margin, y: sigLineY },
+        end: { x: margin + 220, y: sigLineY },
+        thickness: 0.5,
+        color: rgb(0.2, 0.2, 0.2)
+      });
+      page.drawText('Signature', {
+        x: margin,
+        y: sigLineY - 14,
+        size: 8,
+        font: font,
+        color: rgb(0.42, 0.45, 0.5)
+      });
+
+      // Name
+      page.drawText(signerName, {
+        x: margin + 260,
+        y: yPos - 15,
+        size: 11,
+        font: fontBold,
+        color: rgb(0.22, 0.25, 0.32)
+      });
+      page.drawLine({
+        start: { x: margin + 260, y: yPos - 20 },
+        end: { x: pageWidth - margin, y: yPos - 20 },
+        thickness: 0.5,
+        color: rgb(0.2, 0.2, 0.2)
+      });
+      page.drawText('Printed Name', {
+        x: margin + 260,
+        y: yPos - 34,
+        size: 8,
+        font: font,
+        color: rgb(0.42, 0.45, 0.5)
+      });
+
+      // Title / Position
+      if (signerTitle) {
+        page.drawText(signerTitle, {
+          x: margin + 260,
+          y: yPos - 55,
+          size: 11,
+          font: font,
+          color: rgb(0.22, 0.25, 0.32)
+        });
+      }
+      page.drawLine({
+        start: { x: margin + 260, y: yPos - 60 },
+        end: { x: pageWidth - margin, y: yPos - 60 },
+        thickness: 0.5,
+        color: rgb(0.2, 0.2, 0.2)
+      });
+      page.drawText('Title / Position', {
+        x: margin + 260,
+        y: yPos - 74,
+        size: 8,
+        font: font,
+        color: rgb(0.42, 0.45, 0.5)
+      });
+
+      // Date
+      page.drawText(signDate, {
+        x: margin,
+        y: yPos - 55,
+        size: 11,
+        font: font,
+        color: rgb(0.22, 0.25, 0.32)
+      });
+      page.drawLine({
+        start: { x: margin, y: yPos - 60 },
+        end: { x: margin + 220, y: yPos - 60 },
+        thickness: 0.5,
+        color: rgb(0.2, 0.2, 0.2)
+      });
+      page.drawText('Date', {
+        x: margin,
+        y: yPos - 74,
+        size: 8,
+        font: font,
+        color: rgb(0.42, 0.45, 0.5)
+      });
+    }
+  }
+
+  return await pdfDoc.save();
+}
+
+function updateDocCardUI(docType) {
+  const cardId = docType === 'loa' ? 'loa-card' : 'loe-card';
+  const card = document.getElementById(cardId);
+  if (!card) return;
+
+  card.classList.add('signed');
+
+  // Update button text
+  const btn = card.querySelector('.docusign-btn');
+  if (btn) {
+    btn.innerHTML = `
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+      Signed
+    `;
+  }
+
+  // Add signed badge
+  const existing = card.querySelector('.docusign-signed-badge');
+  if (!existing) {
+    const badge = document.createElement('div');
+    badge.className = 'docusign-signed-badge';
+    badge.innerHTML = `
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      Signed by ${signedDocuments[docType].signerName}
+    `;
+    card.appendChild(badge);
+  }
 }
 
 // Utility functions

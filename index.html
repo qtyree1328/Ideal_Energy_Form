@@ -12,6 +12,8 @@
     <link href="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.css" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 </head>
 <body>
     <!-- Landing Page -->
@@ -288,28 +290,28 @@
                         <p>Not sure if your state qualifies? <a href="#" class="footer-link" data-tab="home" style="color: var(--primary-orange);">Check our interactive map</a> or start the qualification process to find out.</p>
                     </div>
                 </div>
-
-                <!-- Footer Section -->
-                <footer class="landing-footer-new landing-footer-compact">
-                    <div class="footer-content-new">
-                        <div class="footer-column footer-brand">
-                            <img src="assets/Ideal_logo.png" alt="Ideal Energy" class="footer-logo-img">
-                            <p>Your trusted energy procurement partner.</p>
-                        </div>
-                        <div class="footer-column footer-quick-links">
-                            <ul class="footer-links footer-links-inline">
-                                <li><a href="#" class="footer-link" data-tab="home">Home</a></li>
-                                <li><a href="#" class="footer-link" data-tab="about">About</a></li>
-                            </ul>
-                        </div>
-                        <div class="footer-column footer-contact-col">
-                            <p class="footer-contact">
-                                <a href="mailto:info@idealenergy.com">info@idealenergy.com</a>
-                            </p>
-                        </div>
-                    </div>
-                </footer>
             </div>
+
+            <!-- Footer Section (outside landing-container for full width) -->
+            <footer class="landing-footer-new landing-footer-compact">
+                <div class="footer-content-new">
+                    <div class="footer-column footer-brand">
+                        <img src="assets/Ideal_logo.png" alt="Ideal Energy" class="footer-logo-img">
+                        <p>Your trusted energy procurement partner.</p>
+                    </div>
+                    <div class="footer-column footer-quick-links">
+                        <ul class="footer-links footer-links-inline">
+                            <li><a href="#" class="footer-link" data-tab="home">Home</a></li>
+                            <li><a href="#" class="footer-link" data-tab="about">About</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column footer-contact-col">
+                        <p class="footer-contact">
+                            <a href="mailto:idealenergyforms@gmail.com">idealenergyforms@gmail.com</a>
+                        </p>
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
 
@@ -385,6 +387,85 @@
                 <p style="margin-top: 16px;">We'll work with you to determine if you qualify and find the best available options in your market.</p>
                 <div style="margin-top: 24px; text-align: center;">
                     <button class="nav-button next" id="continue-limited-btn" style="padding: 14px 28px;">Continue with Ideal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spend Threshold Modal -->
+    <div class="popup-overlay" id="spend-threshold-overlay">
+        <div class="popup-card">
+            <div class="popup-header">
+                <h3 class="popup-title">Minimum Spend Not Met</h3>
+                <button class="popup-close" id="spend-threshold-close">&times;</button>
+            </div>
+            <div class="popup-content">
+                <p>Ideal's energy auction platform is designed for businesses with a monthly energy portfolio spend of <strong>$5,000 or more</strong>. This threshold allows us to negotiate meaningfully lower rates through our competitive auction process.</p>
+                <p style="margin-top: 16px;">If your energy spend is growing or you have multiple locations that combined exceed this threshold, please reach out to us directly — we may still be able to help.</p>
+                <div style="margin-top: 24px; text-align: center;">
+                    <button class="nav-button next" id="spend-threshold-close-btn" style="padding: 14px 28px;">Got It</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Residential Blocked Modal -->
+    <div class="popup-overlay" id="residential-overlay">
+        <div class="popup-card">
+            <div class="popup-header">
+                <h3 class="popup-title">Residential Properties Not Supported</h3>
+                <button class="popup-close" id="residential-close">&times;</button>
+            </div>
+            <div class="popup-content">
+                <p>Ideal currently works with commercial properties only. Our energy auction platform is designed for businesses with commercial-scale energy usage.</p>
+                <p style="margin-top: 16px;">If you manage a large multi-unit residential complex with commercial energy accounts, please contact us directly to discuss your options.</p>
+                <div style="margin-top: 24px; text-align: center;">
+                    <button class="nav-button next" id="residential-close-btn" style="padding: 14px 28px;">Got It</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Signing Modal -->
+    <div class="popup-overlay" id="signing-overlay">
+        <div class="signing-modal">
+            <div class="signing-modal-header">
+                <h3 class="signing-modal-title" id="signing-modal-title">Sign Document</h3>
+                <button class="popup-close" id="signing-close">&times;</button>
+            </div>
+            <div class="signing-modal-body">
+                <div class="signing-document" id="signing-document-content">
+                    <!-- Document text inserted by JS -->
+                </div>
+                <div class="signing-form">
+                    <div class="signing-fields">
+                        <div class="signing-field">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-text-input" id="signing-name" placeholder="Enter your full name">
+                        </div>
+                        <div class="signing-field">
+                            <label class="form-label">Title / Position</label>
+                            <input type="text" class="form-text-input" id="signing-title" placeholder="e.g., Owner, Facility Manager">
+                        </div>
+                        <div class="signing-field">
+                            <label class="form-label">Date</label>
+                            <input type="text" class="form-text-input" id="signing-date" readonly>
+                        </div>
+                    </div>
+                    <div class="signature-pad-wrapper">
+                        <label class="form-label">Signature</label>
+                        <div class="signature-pad-container">
+                            <canvas id="signature-canvas"></canvas>
+                        </div>
+                        <div class="signature-pad-actions">
+                            <button class="signature-clear-btn" id="signature-clear">Clear</button>
+                            <span class="signature-hint">Draw your signature above</span>
+                        </div>
+                    </div>
+                    <div class="signing-actions">
+                        <button class="nav-button skip" id="signing-cancel" style="padding: 12px 28px;">Cancel</button>
+                        <button class="nav-button next" id="signing-submit" style="padding: 12px 28px;" disabled>Sign & Complete</button>
+                    </div>
                 </div>
             </div>
         </div>
